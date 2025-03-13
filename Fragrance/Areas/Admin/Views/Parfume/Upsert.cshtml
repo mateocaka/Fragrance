@@ -1,0 +1,136 @@
+﻿@model ParfumeVM
+
+
+<div class="cart shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2">@(Model.Parfum.ParfumeId != 0 ? "Update" : "Create") Product</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <form method="post" class="row" enctype="multipart/form-data">
+            <input asp-for="Parfum.ParfumeId" hidden />
+            <input asp-for="Parfum.ImgUrl" hidden/>
+            <div class="row">
+                <div class="col-10">
+                    <div class="border p-3">
+                        @*  <div asp-validation-summary="ModelOnly"></div> *@
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Parfum.Name" class="form-control border-0 shadow" />
+                            <label asp-for="Parfum.Name" class="ms-2"></label>
+                            <span asp-validation-for="Parfum.Name" class="text-danger"></span>
+                        </div>
+                        <div class="py-2 col-12">
+                            <label asp-for="Parfum.Author" class="ms-2 text-muted"></label>
+                            <textarea asp-for="Parfum.Author" class="form-control border-0 shadow"> </textarea>
+
+
+                        </div>
+                        <div class="py-2 col-12">
+                            <label asp-for="Parfum.description" class="ms-2 text-muted"></label>
+                            <textarea asp-for="Parfum.description" class="form-control border-0 shadow"> </textarea>
+
+
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Parfum.Gender" class="form-control border-0 shadow" />
+                            <label asp-for="Parfum.Gender" class="ms-2"></label>
+
+                            <span asp-validation-for="Parfum.Gender" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Parfum.BaseNotes" class="form-control border-0 shadow" />
+                            <label asp-for="Parfum.BaseNotes" class="ms-2"></label>
+
+                            <span asp-validation-for="Parfum.BaseNotes" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Parfum.ListPrice" class="form-control border-0 shadow" />
+                            <label asp-for="Parfum.ListPrice" class="ms-2"></label>
+
+                            <span asp-validation-for="Parfum.ListPrice" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Parfum.Price" class="form-control border-0 shadow" />
+                            <label asp-for="Parfum.Price" class="ms-2"></label>
+
+                            <span asp-validation-for="Parfum.Price" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Parfum.Price50" class="form-control border-0 shadow" />
+                            <label asp-for="Parfum.Price50" class="ms-2"></label>
+
+                            <span asp-validation-for="Parfum.Price50" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Parfum.Price100" class="form-control border-0 shadow" />
+                            <label asp-for="Parfum.Price100" class="ms-2"></label>
+
+                            <span asp-validation-for="Parfum.Price100" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Parfum.TopNotes" class="form-control border-0 shadow" />
+                            <label asp-for="Parfum.TopNotes" class="ms-2"></label>
+
+                            <span asp-validation-for="Parfum.TopNotes" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="Parfum.MiddleNotes" class="form-control border-0 shadow" />
+                            <label asp-for="Parfum.MiddleNotes" class="ms-2"></label>
+
+                            <span asp-validation-for="Parfum.MiddleNotes" class="text-danger"></span>
+                        </div>
+
+
+                  
+                        <div class="form-floating py-2 col-12">
+                            <input type="file" name="file" class="form-control border-0 shadow" />
+                            <label asp-for="Parfum.ImgUrl" class="ms-2"></label>
+                            <span asp-validation-for="Parfum.ImgUrl" class="text-danger"></span>
+                        </div>
+                        <div class="row pt-2">
+                            <div class="col-6 col-md-3">
+                                @if (Model.Parfum.ParfumeId != 0)
+                                {
+                                    <button type="submit" class="btn btn-outline-primary">Update</button>
+
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn btn-outline-primary">Create</button>
+                                }
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a asp-controller="Parfume" asp-action="Index" class="btn btn-secondary border from-controler">
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="col-2">
+                    <img src="@Model.Parfum.ImgUrl" width="100%" 
+                    style="border-radius:5px; border:1px solid #bbb9b9"/>
+                </div>
+            </div>
+           
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+
+            @section Scripts{
+    
+                @{
+                    <partial name ="_ValidationScriptsPartial"/>
+                }
+            }
