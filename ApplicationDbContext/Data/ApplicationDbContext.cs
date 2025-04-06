@@ -40,7 +40,12 @@ namespace Fragrance.Data
          Price = 100,
          Price50 = 90,
          Price100 = 80,
-         ImgUrl = ""
+         ImgUrl = "",
+         Quantity = 99,
+         Size30 = 30,
+         Size50 = 50,
+         Size100 = 100,
+         Rating = 4.1
      },
      new Parfume
      {
@@ -56,7 +61,12 @@ namespace Fragrance.Data
          Price = 140,
          Price50 = 130,
          Price100 = 120,
-         ImgUrl = ""
+         ImgUrl = "",
+         Quantity = 99,
+         Size30 = 30,
+         Size50 = 50,
+         Size100 = 100,
+         Rating = 4.7
      },
      new Parfume
      {
@@ -72,7 +82,12 @@ namespace Fragrance.Data
          Price = 100,
          Price50 = 90,
          Price100 = 85,
-         ImgUrl = ""
+         ImgUrl = "",
+         Quantity = 99,
+         Size30 = 30,
+         Size50 = 50,
+         Size100 = 100,
+         Rating = 4.5
      },
      new Parfume
      {
@@ -88,7 +103,12 @@ namespace Fragrance.Data
          Price = 120,
          Price50 = 110,
          Price100 = 100,
-         ImgUrl = ""
+         ImgUrl = "",
+         Quantity = 99,
+         Size30 = 30,
+         Size50 = 50,
+         Size100 = 100,
+         Rating = 4.9
      },
      new Parfume
      {
@@ -104,7 +124,12 @@ namespace Fragrance.Data
          Price = 130,
          Price50 = 120,
          Price100 = 110,
-         ImgUrl = ""
+         ImgUrl = "",
+         Quantity = 99,
+         Size30 = 30,
+         Size50 = 50,
+         Size100 = 100,
+         Rating = 4.8
      },
      new Parfume
      {
@@ -120,7 +145,12 @@ namespace Fragrance.Data
          Price = 140,
          Price50 = 130,
          Price100 = 120,
-         ImgUrl = ""
+         ImgUrl = "",
+         Quantity = 99,
+         Size30 = 30,
+         Size50 = 50,
+         Size100 = 100,
+         Rating = 4.2
      },
      new Parfume
      {
@@ -136,7 +166,12 @@ namespace Fragrance.Data
          Price = 190,
          Price50 = 180,
          Price100 = 170,
-         ImgUrl = ""
+         ImgUrl = "",
+         Quantity = 99,
+         Size30 = 30,
+         Size50 = 50,
+         Size100 = 100,
+         Rating = 4.3
      },
      new Parfume
      {
@@ -152,7 +187,12 @@ namespace Fragrance.Data
          Price = 150,
          Price50 = 140,
          Price100 = 130,
-         ImgUrl = ""
+         ImgUrl = "",
+         Quantity = 99,
+         Size30 = 30,
+         Size50 = 50,
+         Size100 = 100,
+         Rating = 4.0
      },
      new Parfume
      {
@@ -168,7 +208,12 @@ namespace Fragrance.Data
          Price = 100,
          Price50 = 95,
          Price100 = 90,
-         ImgUrl = ""
+         ImgUrl = "",
+         Quantity = 99,
+         Size30 = 30,
+         Size50 = 50,
+         Size100 = 100,
+         Rating = 4.3
      },
      new Parfume
      {
@@ -184,7 +229,12 @@ namespace Fragrance.Data
          Price = 170,
          Price50 = 160,
          Price100 = 150,
-         ImgUrl = ""
+         ImgUrl = "",
+         Quantity = 99,
+         Size30 = 30,
+         Size50 = 50,
+         Size100 = 100,
+         Rating = 4.5
      }
  );
         }

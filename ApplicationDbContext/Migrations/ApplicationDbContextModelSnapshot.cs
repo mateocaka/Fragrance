@@ -51,7 +51,7 @@ namespace Fragrance.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("Fragrance.Models.OrderDetail", b =>
@@ -80,7 +80,7 @@ namespace Fragrance.DataAccess.Migrations
 
                     b.HasIndex("ParfumeId");
 
-                    b.ToTable("OrderDetail", (string)null);
+                    b.ToTable("OrderDetail");
                 });
 
             modelBuilder.Entity("Fragrance.Models.OrderHeader", b =>
@@ -153,7 +153,7 @@ namespace Fragrance.DataAccess.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("OrderHeader", (string)null);
+                    b.ToTable("OrderHeader");
                 });
 
             modelBuilder.Entity("Fragrance.Models.Parfume", b =>
@@ -202,6 +202,21 @@ namespace Fragrance.DataAccess.Migrations
                     b.Property<double>("Price50")
                         .HasColumnType("float");
 
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Rating")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Size100")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Size30")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Size50")
+                        .HasColumnType("int");
+
                     b.Property<string>("TopNotes")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -214,7 +229,7 @@ namespace Fragrance.DataAccess.Migrations
 
                     b.HasKey("ParfumeId");
 
-                    b.ToTable("Parfumes", (string)null);
+                    b.ToTable("Parfumes");
 
                     b.HasData(
                         new
@@ -230,6 +245,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 100.0,
                             Price100 = 80.0,
                             Price50 = 90.0,
+                            Quantity = 99,
+                            Rating = 4.0999999999999996,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Cardamom,Lavender",
                             description = "A bold and intense fragrance."
                         },
@@ -246,6 +266,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 140.0,
                             Price100 = 120.0,
                             Price50 = 130.0,
+                            Quantity = 99,
+                            Rating = 4.7000000000000002,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Cinnamon,Pepper",
                             description = "A sweet and spicy fragrance with tobacco notes."
                         },
@@ -262,6 +287,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 100.0,
                             Price100 = 85.0,
                             Price50 = 90.0,
+                            Quantity = 99,
+                            Rating = 4.5,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Pepper,Grapefruit",
                             description = "A powerful and warm spicy scent."
                         },
@@ -278,6 +308,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 120.0,
                             Price100 = 100.0,
                             Price50 = 110.0,
+                            Quantity = 99,
+                            Rating = 4.9000000000000004,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Pink Pepper,Neroli",
                             description = "A warm and cozy fragrance with boozy notes."
                         },
@@ -294,6 +329,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 130.0,
                             Price100 = 110.0,
                             Price50 = 120.0,
+                            Quantity = 99,
+                            Rating = 4.7999999999999998,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Pink Pepper,Juniper",
                             description = "A sweet and gourmand fragrance."
                         },
@@ -310,6 +350,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 140.0,
                             Price100 = 120.0,
                             Price50 = 130.0,
+                            Quantity = 99,
+                            Rating = 4.2000000000000002,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Ginger,Bergamot",
                             description = "A warm, woody fragrance with an intense character."
                         },
@@ -326,6 +371,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 190.0,
                             Price100 = 170.0,
                             Price50 = 180.0,
+                            Quantity = 99,
+                            Rating = 4.2999999999999998,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Tobacco Leaf,Spices",
                             description = "A luxurious blend of tobacco and vanilla."
                         },
@@ -342,6 +392,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 150.0,
                             Price100 = 130.0,
                             Price50 = 140.0,
+                            Quantity = 99,
+                            Rating = 4.0,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Cardamom",
                             description = "A leather fragrance with a bold, smoky feel."
                         },
@@ -358,6 +413,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 100.0,
                             Price100 = 90.0,
                             Price50 = 95.0,
+                            Quantity = 99,
+                            Rating = 4.2999999999999998,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Cardamom",
                             description = "A seductive fragrance with a blend of spices and woods."
                         },
@@ -374,6 +434,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 170.0,
                             Price100 = 150.0,
                             Price50 = 160.0,
+                            Quantity = 99,
+                            Rating = 4.5,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Grapefruit,Lemon",
                             description = "A fresh, woody fragrance that embodies freedom."
                         });
@@ -403,7 +468,7 @@ namespace Fragrance.DataAccess.Migrations
 
                     b.HasIndex("ParfumeId");
 
-                    b.ToTable("ShopingCarts", (string)null);
+                    b.ToTable("ShopingCarts");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

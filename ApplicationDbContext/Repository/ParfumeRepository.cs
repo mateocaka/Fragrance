@@ -32,6 +32,11 @@ namespace Fragrance.DataAccess.Repository
                 objFromDb.Price = obj.Price;
                 objFromDb.Price50 = obj.Price50;
                 objFromDb.Price100 = obj.Price100;
+                objFromDb.Quantity = obj.Quantity;
+                objFromDb.Size30 = obj.Size30;
+                objFromDb.Size50 = obj.Size50;
+                objFromDb.Size100 = obj.Size100;
+                objFromDb.Rating = obj.Rating;
                 if (obj.ImgUrl != null) 
                 {
                     objFromDb.ImgUrl= obj.ImgUrl;

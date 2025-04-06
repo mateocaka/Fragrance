@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security.Claims;
 using Fragrance.DataAccess.Repository.IRepository;
@@ -8,6 +8,7 @@ using Fragrance.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Fragrance.Areas.Costumer.Controllers
 
@@ -25,14 +26,63 @@ namespace Fragrance.Areas.Costumer.Controllers
             _unitOfWork = unitOfWork;
         }
 
-       public IActionResult Index()
+        public IActionResult Index(string search, string gender, string brand, string rating)
         {
-          
-            IEnumerable<Parfume> parfumelist = _unitOfWork.Parfume.GetAll();
-            return View(parfumelist);
-        }
+            var allPerfumes = _unitOfWork.Parfume.GetAll().ToList();
 
-        public IActionResult Detials(int parfumeid)
+          
+            var filteredPerfumes = allPerfumes.AsEnumerable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                filteredPerfumes = filteredPerfumes.Where(p =>
+                    p.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    p.Author.Contains(search, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrEmpty(gender))
+            {
+                filteredPerfumes = filteredPerfumes.Where(p => p.Gender == gender);
+            }
+
+            if (!string.IsNullOrEmpty(brand))
+            {
+                filteredPerfumes = filteredPerfumes.Where(p =>
+                    p.Author.Equals(brand, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrEmpty(rating) && double.TryParse(rating.TrimEnd('+'), out double minRating))
+            {
+                filteredPerfumes = filteredPerfumes.Where(p => p.Rating >= minRating);
+            }
+
+           
+            ViewBag.OriginalData = allPerfumes;
+            ViewBag.Genders = new List<string> { "Male", "Female", "Unisex" };
+            ViewBag.Brands = allPerfumes
+                .Select(p => p.Author)
+                .Distinct()
+                .OrderBy(a => a)
+                .ToList();
+
+            var ratingsList = new List<string> {"1", "2", "3", "4","5" };
+            ViewBag.Ratings = ratingsList;
+    
+            ViewBag.CurrentFilters = new
+            {
+                Search = search,
+                Gender = gender,
+                Brand = brand,
+                Rating = rating
+            };
+            if (filteredPerfumes!=null)
+            {
+                return View(filteredPerfumes);
+            }
+            
+            return View(filteredPerfumes);
+        }
+        public IActionResult Details(int parfumeid)
         {
             ShoppingCart cart = new()
             {
@@ -46,7 +96,7 @@ namespace Fragrance.Areas.Costumer.Controllers
         }
         [HttpPost]
         [Authorize]
-        public IActionResult Detials(ShoppingCart shoppingCart)
+        public IActionResult Details(ShoppingCart shoppingCart)
         {
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -86,6 +136,7 @@ namespace Fragrance.Areas.Costumer.Controllers
 
         public IActionResult Privacy()
         {
+
             return View();
         }
 

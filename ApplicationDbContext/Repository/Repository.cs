@@ -41,7 +41,6 @@ namespace Fragrance.DataAccess.Repository
             else
             {
                 query = dbSet.AsNoTracking();
-
             }
             query = query.Where(filter);
             if (!String.IsNullOrEmpty(includeProperties))
@@ -51,7 +50,7 @@ namespace Fragrance.DataAccess.Repository
                     query = query.Include(includeProp);
                 }
             }
-            return query.FirstOrDefault();
+            return query.FirstOrDefault()!;
         }
 
 

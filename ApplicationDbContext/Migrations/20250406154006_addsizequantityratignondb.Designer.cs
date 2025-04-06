@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fragrance.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250130202002_addSessionIdToDB")]
-    partial class addSessionIdToDB
+    [Migration("20250406154006_addsizequantityratignondb")]
+    partial class addsizequantityratignondb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -139,7 +139,6 @@ namespace Fragrance.DataAccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SessionId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ShippingDate")
@@ -206,6 +205,21 @@ namespace Fragrance.DataAccess.Migrations
                     b.Property<double>("Price50")
                         .HasColumnType("float");
 
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Rating")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Size100")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Size30")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Size50")
+                        .HasColumnType("int");
+
                     b.Property<string>("TopNotes")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -234,6 +248,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 100.0,
                             Price100 = 80.0,
                             Price50 = 90.0,
+                            Quantity = 99,
+                            Rating = 4.0999999999999996,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Cardamom,Lavender",
                             description = "A bold and intense fragrance."
                         },
@@ -250,6 +269,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 140.0,
                             Price100 = 120.0,
                             Price50 = 130.0,
+                            Quantity = 99,
+                            Rating = 4.7000000000000002,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Cinnamon,Pepper",
                             description = "A sweet and spicy fragrance with tobacco notes."
                         },
@@ -266,6 +290,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 100.0,
                             Price100 = 85.0,
                             Price50 = 90.0,
+                            Quantity = 99,
+                            Rating = 4.5,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Pepper,Grapefruit",
                             description = "A powerful and warm spicy scent."
                         },
@@ -282,6 +311,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 120.0,
                             Price100 = 100.0,
                             Price50 = 110.0,
+                            Quantity = 99,
+                            Rating = 4.9000000000000004,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Pink Pepper,Neroli",
                             description = "A warm and cozy fragrance with boozy notes."
                         },
@@ -298,6 +332,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 130.0,
                             Price100 = 110.0,
                             Price50 = 120.0,
+                            Quantity = 99,
+                            Rating = 4.7999999999999998,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Pink Pepper,Juniper",
                             description = "A sweet and gourmand fragrance."
                         },
@@ -314,6 +353,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 140.0,
                             Price100 = 120.0,
                             Price50 = 130.0,
+                            Quantity = 99,
+                            Rating = 4.2000000000000002,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Ginger,Bergamot",
                             description = "A warm, woody fragrance with an intense character."
                         },
@@ -330,6 +374,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 190.0,
                             Price100 = 170.0,
                             Price50 = 180.0,
+                            Quantity = 99,
+                            Rating = 4.2999999999999998,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Tobacco Leaf,Spices",
                             description = "A luxurious blend of tobacco and vanilla."
                         },
@@ -346,6 +395,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 150.0,
                             Price100 = 130.0,
                             Price50 = 140.0,
+                            Quantity = 99,
+                            Rating = 4.0,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Cardamom",
                             description = "A leather fragrance with a bold, smoky feel."
                         },
@@ -362,6 +416,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 100.0,
                             Price100 = 90.0,
                             Price50 = 95.0,
+                            Quantity = 99,
+                            Rating = 4.2999999999999998,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Cardamom",
                             description = "A seductive fragrance with a blend of spices and woods."
                         },
@@ -378,6 +437,11 @@ namespace Fragrance.DataAccess.Migrations
                             Price = 170.0,
                             Price100 = 150.0,
                             Price50 = 160.0,
+                            Quantity = 99,
+                            Rating = 4.5,
+                            Size100 = 100,
+                            Size30 = 30,
+                            Size50 = 50,
                             TopNotes = "Grapefruit,Lemon",
                             description = "A fresh, woody fragrance that embodies freedom."
                         });

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Fragrance.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class addtodb : Migration
+    public partial class addtodatabaz : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,34 +28,21 @@ namespace Fragrance.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
+                name: "Companies",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
-                    Name = table.Column<int>(type: "int", nullable: true),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StreetAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.PrimaryKey("PK_Companies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -65,11 +52,12 @@ namespace Fragrance.DataAccess.Migrations
                     ParfumeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Author = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TopNotes = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MiddleNotes = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BaseNotes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    TopNotes = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    MiddleNotes = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    BaseNotes = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     ListPrice = table.Column<double>(type: "float", nullable: false),
                     Price = table.Column<double>(type: "float", nullable: false),
                     Price50 = table.Column<double>(type: "float", nullable: false),
@@ -100,6 +88,43 @@ namespace Fragrance.DataAccess.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StreetAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyId = table.Column<int>(type: "int", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -188,6 +213,41 @@ namespace Fragrance.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrderHeader",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ShippingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OrderTotal = table.Column<double>(type: "float", nullable: false),
+                    OrderStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Carrier = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaymentDueData = table.Column<DateOnly>(type: "date", nullable: false),
+                    SessionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentIntentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StreetAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderHeader", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderHeader_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ShopingCarts",
                 columns: table => new
                 {
@@ -214,21 +274,49 @@ namespace Fragrance.DataAccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "OrderDetail",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderHeaderId = table.Column<int>(type: "int", nullable: false),
+                    ParfumeId = table.Column<int>(type: "int", nullable: false),
+                    Count = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderDetail", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderDetail_OrderHeader_OrderHeaderId",
+                        column: x => x.OrderHeaderId,
+                        principalTable: "OrderHeader",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderDetail_Parfumes_ParfumeId",
+                        column: x => x.ParfumeId,
+                        principalTable: "Parfumes",
+                        principalColumn: "ParfumeId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Parfumes",
-                columns: new[] { "ParfumeId", "BaseNotes", "Gender", "ImgUrl", "ListPrice", "MiddleNotes", "Name", "Price", "Price100", "Price50", "TopNotes", "description" },
+                columns: new[] { "ParfumeId", "Author", "BaseNotes", "Gender", "ImgUrl", "ListPrice", "MiddleNotes", "Name", "Price", "Price100", "Price50", "TopNotes", "description" },
                 values: new object[,]
                 {
-                    { 1, "Tonka Bean,Amber", "Male", "", 120.0, "Vanilla,Benzoin", "Le Male Elixir", 100.0, 80.0, 90.0, "Cardamom,Lavender", "A bold and intense fragrance." },
-                    { 2, "Vanilla,Cedarwood", "Unisex", "", 150.0, "Tobacco,Incense", "Herod", 140.0, 120.0, 130.0, "Cinnamon,Pepper", "A sweet and spicy fragrance with tobacco notes." },
-                    { 3, "Tobacco,Vanilla", "Male", "", 110.0, "Cinnamon,Saffron", "Spicebomb Extreme", 100.0, 85.0, 90.0, "Pepper,Grapefruit", "A powerful and warm spicy scent." },
-                    { 4, "Tobacco,Vanilla", "Male", "", 130.0, "Rum,Clary Sage", "Jazz Club", 120.0, 100.0, 110.0, "Pink Pepper,Neroli", "A warm and cozy fragrance with boozy notes." },
-                    { 5, "Vanilla,Tonka Bean", "Male", "", 140.0, "Lavender,Sage", "Stronger With You Intensely", 130.0, 110.0, 120.0, "Pink Pepper,Juniper", "A sweet and gourmand fragrance." },
-                    { 6, "Vanilla,Amber", "Male", "", 150.0, "Wood Accord", "The Most Wanted Parfum", 140.0, 120.0, 130.0, "Ginger,Bergamot", "A warm, woody fragrance with an intense character." },
-                    { 7, "Dried Fruits,Wood", "Unisex", "", 200.0, "Vanilla,Cacao", "Tobacco Vanille", 190.0, 170.0, 180.0, "Tobacco Leaf,Spices", "A luxurious blend of tobacco and vanilla." },
-                    { 8, "Amber,Moss", "Unisex", "", 160.0, "Leather,Jasmine Sambac", "Ombre Leather", 150.0, 130.0, 140.0, "Cardamom", "A leather fragrance with a bold, smoky feel." },
-                    { 9, "Vetiver,Cedar", "Male", "", 110.0, "Lavender,Bergamot", "La Nuit de L'Homme", 100.0, 90.0, 95.0, "Cardamom", "A seductive fragrance with a blend of spices and woods." },
-                    { 10, "Sandalwood,Cedar", "Male", "", 180.0, "Ginger,Nutmeg", "Bleu de Chanel", 170.0, 150.0, 160.0, "Grapefruit,Lemon", "A fresh, woody fragrance that embodies freedom." }
+                    { 1, "Jean Paul Gaultier", "Tonka Bean,Amber", "Male", "", 120.0, "Vanilla,Benzoin", "Le Male Elixir", 100.0, 80.0, 90.0, "Cardamom,Lavender", "A bold and intense fragrance." },
+                    { 2, "Parfume de Marly", "Vanilla,Cedarwood", "Unisex", "", 150.0, "Tobacco,Incense", "Herod", 140.0, 120.0, 130.0, "Cinnamon,Pepper", "A sweet and spicy fragrance with tobacco notes." },
+                    { 3, "Viktor Rolf", "Tobacco,Vanilla", "Male", "", 110.0, "Cinnamon,Saffron", "Spicebomb Extreme", 100.0, 85.0, 90.0, "Pepper,Grapefruit", "A powerful and warm spicy scent." },
+                    { 4, "Maison Margiela", "Tobacco,Vanilla", "Male", "", 130.0, "Rum,Clary Sage", "Jazz Club", 120.0, 100.0, 110.0, "Pink Pepper,Neroli", "A warm and cozy fragrance with boozy notes." },
+                    { 5, "Armani", "Vanilla,Tonka Bean", "Male", "", 140.0, "Lavender,Sage", "Stronger With You Intensely", 130.0, 110.0, 120.0, "Pink Pepper,Juniper", "A sweet and gourmand fragrance." },
+                    { 6, "Azzaro", "Vanilla,Amber", "Male", "", 150.0, "Wood Accord", "The Most Wanted Parfum", 140.0, 120.0, 130.0, "Ginger,Bergamot", "A warm, woody fragrance with an intense character." },
+                    { 7, "Tom Ford", "Dried Fruits,Wood", "Unisex", "", 200.0, "Vanilla,Cacao", "Tobacco Vanille", 190.0, 170.0, 180.0, "Tobacco Leaf,Spices", "A luxurious blend of tobacco and vanilla." },
+                    { 8, "Tom Ford", "Amber,Moss", "Unisex", "", 160.0, "Leather,Jasmine Sambac", "Ombre Leather", 150.0, 130.0, 140.0, "Cardamom", "A leather fragrance with a bold, smoky feel." },
+                    { 9, "Yves Saint Laurent", "Vetiver,Cedar", "Male", "", 110.0, "Lavender,Bergamot", "La Nuit de L'Homme", 100.0, 90.0, 95.0, "Cardamom", "A seductive fragrance with a blend of spices and woods." },
+                    { 10, "Chanel", "Sandalwood,Cedar", "Male", "", 180.0, "Ginger,Nutmeg", "Bleu de Chanel", 170.0, 150.0, 160.0, "Grapefruit,Lemon", "A fresh, woody fragrance that embodies freedom." }
                 });
 
             migrationBuilder.CreateIndex(
@@ -264,11 +352,31 @@ namespace Fragrance.DataAccess.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_CompanyId",
+                table: "AspNetUsers",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDetail_OrderHeaderId",
+                table: "OrderDetail",
+                column: "OrderHeaderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDetail_ParfumeId",
+                table: "OrderDetail",
+                column: "ParfumeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderHeader_ApplicationUserId",
+                table: "OrderHeader",
+                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShopingCarts_ApplicationUserId",
@@ -300,16 +408,25 @@ namespace Fragrance.DataAccess.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "OrderDetail");
+
+            migrationBuilder.DropTable(
                 name: "ShopingCarts");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "OrderHeader");
 
             migrationBuilder.DropTable(
                 name: "Parfumes");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Companies");
         }
     }
 }

@@ -54,7 +54,22 @@ namespace Fragrance.Models
 
         [ValidateNever]
         
-        public string ImgUrl { get; set; } 
+        public string ImgUrl { get; set; }
+
+        [Required]
+        [ValidateNever]
+        public int Size30 { get; set; }=30;
+        [Required]
+        [ValidateNever]
+        public int Size50 { get; set; } = 50;
+        [Required]
+        [ValidateNever]
+        public int Size100 { get; set; }= 100;
+        [Required]
+        public double Rating { get; set; }
+        [Required]
+
+        public int Quantity { get; set; } = 99;
     }
 
 }

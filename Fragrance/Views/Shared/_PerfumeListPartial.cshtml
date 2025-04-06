@@ -1,0 +1,21 @@
+﻿@model IEnumerable<Parfume>
+
+<div class="row">
+    @foreach (var parfume in Model)
+    {
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 shadow">
+                <a asp-action="Details" asp-route-parfumeid="@parfume.ParfumeId">
+                    <img src="@parfume.ImgUrl" class="card-img-top perfume-image" alt="@parfume.Name">
+                </a>
+                <div class="card-body text-center">
+                    <h5 class="card-title">@parfume.Author</h5>
+                    <p class="card-text text-muted">@parfume.Name</p>
+                    <div class="badge bg-light">
+                        @parfume.Price$
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
