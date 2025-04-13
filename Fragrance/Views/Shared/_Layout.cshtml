@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/Fragrance.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="//cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
@@ -84,6 +85,9 @@
             </div>
         </nav>
     </header>
+  
+
+  
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -91,14 +95,32 @@
     </div>
 
    
+   
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+   
+
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="//cdn.datatables.net/2.2.2/js/dataTables.min.js" asp-append-version="true"></script>
     <script src="https://cdn.tiny.cloud/1/cjilvjuwlankq11fna2n0wx47sny7e62pp2xod709rnw6qia/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
-    
+
+    @if (TempData["Notification"] != null)
+    {
+        var notification = TempData["Notification"].ToString().Split('|');
+        <script>
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-bottom-right",
+                "timeOut": "5000"
+            };
+            toastr['@notification[0]']('@notification[1]');
+        </script>
+    }
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

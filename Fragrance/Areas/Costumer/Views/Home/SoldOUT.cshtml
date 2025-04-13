@@ -1,0 +1,36 @@
+﻿@model ShoppingCart
+
+<form method="post">
+    <input hidden asp-for="ParfumeId" />
+    <div class="card shadow border-0 mt-4">
+        <div class="card-header bg-secondary bg-danger text-light py-4">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h3 class="text-white text-uppercase">@Model.Parfume.Name</h3>
+                    <p class="text-white-50 fw-semibold mb-0">SOLD OUT </p>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="py-3">
+                <div class="row">
+                    <div class="col-6 col-md-2 offset-lg-1 pb-1">
+                        <a asp-action="Index" class="btn btn-outline-primary bg-gradient mb-5 fw-semibold btn-sm text-uppercase">
+                            <small>Back to home</small>
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-3 offset-lg-1 text-center mb-3">
+                        <img src="@Model.Parfume.ImgUrl" width="100%" class="rounded" />
+                    </div>
+
+                    <div class="col-12 col-lg-6 offset-lg-1">
+                        <h2>Thank you for your interest in @Model.Parfume.Name We're sorry to inform you that the product is out of stock. We apologize for any inconvenience this may cause,
+                            but we're working hard to get this item back in stock as soon as possible. We'll let you know as soon as we restock @Model.Parfume.Name
+                            <a href="#"><i class="bi bi-bell"></i></a></h2>
+                    </div>
+            </div>
+        </div>
+    </div>
+</form>

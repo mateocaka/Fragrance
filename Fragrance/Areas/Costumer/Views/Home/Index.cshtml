@@ -82,7 +82,7 @@
             <div class="col-md-3">
                 <h4>
                     <a href="@Url.Action("Index")" class="text-decoration-none">
-                       
+
                         <h3 class="text-info-emphasis">CLEAR ALL FILTERS</h3>
                     </a>
                 </h4>
@@ -121,7 +121,7 @@
                 <h5 class="mt-4">RATING</h5>
                 <div class="btn-group-vertical w-100">
                     @{
-                        
+
                         var ratingMap = new Dictionary<string, string>
                     {
                     {"1", "⭐"},
@@ -152,9 +152,18 @@
                     {
                         <div class="col-lg-4 col-md-6 mb-4">
                             <div class="card h-100 shadow">
-                                <a asp-action="Details" asp-route-parfumeid="@parfume.ParfumeId">
-                                    <img src="@parfume.ImgUrl" class="card-img-top perfume-image" alt="@parfume.Name">
-                                </a>
+                                @if (parfume.Quantity == 0)
+                                {
+                                    <a asp-action="SoldOUT" asp-route-parfumeid="@parfume.ParfumeId">
+                                        <img src="~/images/Product/360_F_1333122870_gxDGHUPtdJYruUGTSpHCpwuHjVxzFnjx.jpg" class="card-img-top perfume-image" />
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-action="Details" asp-route-parfumeid="@parfume.ParfumeId">
+                                        <img src="@parfume.ImgUrl" class="card-img-top perfume-image" alt="@parfume.Name">
+                                    </a>
+                                }
                                 <div class="card-body text-center">
                                     <h5 class="card-title">@parfume.Author</h5>
                                     <p class="card-text text-muted">@parfume.Name</p>

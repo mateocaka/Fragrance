@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Fragrance.Areas.Costumer.Controllers
-
+        
 {
     [Area("Costumer")]
 
@@ -83,6 +83,18 @@ namespace Fragrance.Areas.Costumer.Controllers
             return View(filteredPerfumes);
         }
         public IActionResult Details(int parfumeid)
+        {        
+            ShoppingCart cart = new()
+            {
+                Parfume = _unitOfWork.Parfume.Get(u => u.ParfumeId == parfumeid),
+                Count = 1,
+                ParfumeId = parfumeid,
+            };
+
+
+            return View(cart);
+        }
+        public IActionResult SoldOUT(int parfumeid)
         {
             ShoppingCart cart = new()
             {
@@ -101,29 +113,34 @@ namespace Fragrance.Areas.Costumer.Controllers
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
             shoppingCart.ApplicationUserId = userId;
+            var parfume = _unitOfWork.Parfume.Get(u => u.ParfumeId == shoppingCart.ParfumeId);
 
-          
             ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.Get(u =>
                 u.ApplicationUserId == userId && u.ParfumeId == shoppingCart.ParfumeId);
-
+            if (shoppingCart.Count > parfume.Quantity)
+            {
+                TempData["Notification"] = "error|Not enough stock available";
+                return RedirectToAction(nameof(Index));
+            }
             if (cartFromDb != null)
             {
                 
                 cartFromDb.Count += shoppingCart.Count;
+               
                 _unitOfWork.ShoppingCart.Update(cartFromDb);
                 _unitOfWork.Save();
             }
             else
             {
                 //add cart and also add session
+               
                 _unitOfWork.ShoppingCart.Add(shoppingCart);
                 _unitOfWork.Save();
                 HttpContext.Session.SetInt32(SD.SessionCart, 
                 _unitOfWork.ShoppingCart.GetAll(u =>
                 u.ApplicationUserId == userId).Count());
             }
-            TempData["success"] = "Cart update successfully";
-
+            TempData["Notification"] = "success|Cart update successfully";
 
 
             _unitOfWork.Save();

@@ -1,87 +1,9 @@
-﻿$('#liveSearch').on('input', debounce(function () {
-    $('#perfumeResults').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</div>');
-    // rest of AJAX call
-}, 300));
+﻿$(document).ready(function () {
+    loadDataTable();
+});
 
-@section Scripts {
-    <script>
-        $(document).ready(function() {
-            // Handle form submission
-            $('#filterForm').on('submit', function (e) {
-                e.preventDefault();
-                applyFilters();
-            });
-
-        // Handle search input changes (with debounce)
-        let searchTimer;
-        $('#searchInput').on('input', function() {
-            clearTimeout(searchTimer);
-        searchTimer = setTimeout(applyFilters, 500);
-            });
-
-        // Handle filter removal
-        $('.remove-filter').on('click', function(e) {
-            e.preventDefault();
-        const filterType = $(this).data('filter');
-        $(`input[name="${filterType}"]`).remove();
-        applyFilters();
-            });
-
-        // Handle gender/brand/rating links
-        $('a[href^="#"]').not('.remove-filter').on('click', function(e) {
-            e.preventDefault();
-        applyFilters();
-            });
-
-        function applyFilters() {
-                const formData = $('#filterForm').serialize();
-
-        // Get any additional filters from clicked links
-        const urlParams = new URLSearchParams(window.location.search);
-                urlParams.forEach((value, key) => {
-                    if (!formData.includes(key) && key !== 'search') {
-            formData += `&${key}=${encodeURIComponent(value)}`;
-                    }
-                });
-
-        $.ajax({
-            url: '@Url.Action("FilterPerfumes", "Home")',
-        type: 'GET',
-        data: formData,
-        success: function(data) {
-            $('#perfumeListContainer').html(data);
-        history.pushState(null, '', '?' + formData);
-                    },
-        error: function() {
-            alert('Error applying filters');
-                    }
-                });
-            }
-
-        // Brand search functionality
-        $('#brandSearch').on('input', function(e) {
-                const searchTerm = e.target.value.toLowerCase();
-        const brands = $('#brandList a');
-
-        brands.each(function() {
-                    const brandText = $(this).text().toLowerCase();
-        $(this).toggle(brandText.includes(searchTerm));
-                });
-            });
-        });
-    </script>
-}
-
-
-$(document).ready(function () {
-    // Check if DataTable already exists
-    if ($.fn.DataTable.isDataTable('#tblData')) {
-        // If it exists, destroy it first
-        $('#tblData').DataTable().destroy();
-    }
-
-    // Initialize DataTable
-    var dataTable = $('#tblData').DataTable({
+function loadDataTable() {
+    dataTable = $('#tblData').DataTable({
         ajax: {
             url: '/admin/order/getall',
             type: 'GET',
@@ -90,8 +12,8 @@ $(document).ready(function () {
         },
         columns: [
             { data: 'id', width: "5%" },
-            { data: 'name', width: "25%" },
-            { data: 'phoneNumber', width: "20%" },
+            { data: 'name', width: "15%" },
+            { data: 'phoneNumber', width: "10%" },
             {
                 data: 'applicationUser.email',
                 render: function (data) {
@@ -99,17 +21,83 @@ $(document).ready(function () {
                 },
                 width: "20%"
             },
-            { data: 'orderStatus', width: "10%" },
+            {
+                data: 'orderStatus',
+                render: function (data) {
+                    if (data === 'Approved') {
+                        return `<span class="badge bg-success">${data}</span>`;
+                    } else if (data === 'Pending') {
+                        return `<span class="badge bg-warning text-dark">${data}</span>`;
+                    } else if (data === 'Cancelled') {
+                        return `<span class="badge bg-danger">${data}</span>`;
+                    }
+                    return `<span class="badge bg-secondary">${data}</span>`;
+                },
+                width: "10%"
+            },
             {
                 data: 'orderTotal',
                 render: function (data) {
                     return '$' + parseFloat(data).toFixed(2);
                 },
                 width: "10%"
+            },
+            { data: 'orderDate', width: "15%" },
+            {
+                data: 'id',
+                render: function (data) {
+                    return `
+                        <div class="text-center">
+                            <a href="/Admin/Order/Details?orderId=${data}" class="btn btn-info mx-2">
+                                <i class="bi bi-pencil-square"></i> Details
+                            </a>
+                        </div>
+                    `;
+                },
+                width: "15%"
             }
         ],
         language: {
             emptyTable: "No orders found."
         }
     });
-});
+}
+
+function updateOrderStatus(orderId, status) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: `You are about to ${status.toLowerCase()} this order`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, proceed!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/Admin/Order/UpdateOrderStatus',
+                type: 'POST',
+                data: {
+                    orderId: orderId,
+                    status: status
+                },
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire(
+                            'Success!',
+                            response.message,
+                            'success'
+                        );
+                        dataTable.ajax.reload();
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message,
+                            'error'
+                        );
+                    }
+                }
+            });
+        }
+    });
+}

@@ -1,12 +1,20 @@
 using Fragrance.Data;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Fragrance.DataAccess.Repository.IRepository;
 using Fragrance.DataAccess.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Fragrance.Utility;
+using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Cookies;
+using Microsoft.Owin.Security.OpenIdConnect;
+using Owin;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Stripe;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using CookieAuthenticationDefaults = Microsoft.Owin.Security.Cookies.CookieAuthenticationDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,13 +34,31 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = $"/Identity/Account/Logout";
     options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
 });
-builder.Services.AddAuthentication().AddFacebook(option =>
+
+builder.Services.AddAuthentication(options =>
 {
-    option.AppId = "531484386144763";
-    option.AppSecret = "9bb337d930842fd5bf2c497c37cf81b4";
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationType;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+})
 
-
-});
+    .AddFacebook(options =>
+    {
+        options.AppId = "531484386144763";
+        options.AppSecret = "9bb337d930842fd5bf2c497c37cf81b4";
+    })
+    .AddGoogle(options =>
+    {
+        options.ClientId = "640937380930-m0up3a52qe5gh4o8psm10107ak12p2nc.apps.googleusercontent.com";
+        options.ClientSecret = "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";
+    })
+    .AddTwitter(options =>
+    {
+        options.ConsumerKey = "tVYLg4Sxiq5SQfB7RjeQIDH69";
+        options.ConsumerSecret = "iAMZfqPcoSMVIwkBOfKHSI0vuLvb9VPBBIm6t76xv6a77pErF0";
+        options.RetrieveUserDetails = true;
+        options.CallbackPath = "/signin-twitter";
+    });
+  
 builder.Services.AddDistributedMemoryCache();
 //ading seesion ne fillim
 builder.Services.AddSession(options =>
@@ -62,6 +88,9 @@ StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey"
 app.UseRouting();
 app.UseAuthorization();
 app.UseSession();
+
+
+
 app.MapStaticAssets();
 
 app.MapControllerRoute(

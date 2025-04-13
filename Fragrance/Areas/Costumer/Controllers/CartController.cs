@@ -29,23 +29,34 @@ namespace Fragrance.Areas.Costumer.Controllers
 
         public IActionResult Index()
         {
-
             var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var useId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             ShoppingCartVM = new()
             {
-                ShoppingCartsList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == useId,
-                includeProperties: "Parfume"),
+                ShoppingCartsList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,
+                    includeProperties: "Parfume"),
                 OrderHeader = new()
-
             };
+
+            bool outOfStockItemExists = false;
 
             foreach (var cart in ShoppingCartVM.ShoppingCartsList)
             {
                 cart.Price = GetPriceBasedOnQuantity(cart);
                 ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+
+                if (cart.Parfume.Quantity == 0)
+                {
+                    outOfStockItemExists = true;
+                }
             }
+
+            if (outOfStockItemExists)
+            {
+                TempData["Notification"] = "warning|Some items in your cart are currently out of stock.";
+            }
+
             return View(ShoppingCartVM);
         }
 
@@ -73,10 +84,12 @@ namespace Fragrance.Areas.Costumer.Controllers
             ShoppingCartVM.OrderHeader.State = ShoppingCartVM.OrderHeader.ApplicationUser.State;
             ShoppingCartVM.OrderHeader.PostalCode = ShoppingCartVM.OrderHeader.ApplicationUser.PostalCode;
 
+
             foreach (var cart in ShoppingCartVM.ShoppingCartsList)
             {
                 cart.Price = GetPriceBasedOnQuantity(cart);
                 ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+               
             }
            
             return View(ShoppingCartVM);
@@ -92,6 +105,21 @@ namespace Fragrance.Areas.Costumer.Controllers
             ShoppingCartVM.ShoppingCartsList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,
                 includeProperties: "Parfume");
 
+
+            foreach (var cart in ShoppingCartVM.ShoppingCartsList)
+            {
+                if (cart.Parfume.Quantity == 0)
+                {
+                    TempData["Notification"] = $"error|{cart.Parfume.Name} is out of stock. Please remove it from your cart to proceed.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                if (cart.Count > cart.Parfume.Quantity)
+                {
+                    TempData["Notification"] = $"error|Only {cart.Parfume.Quantity} items available for {cart.Parfume.Name}. Please adjust your quantity.";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
             ShoppingCartVM.OrderHeader.OrderDate = System.DateTime.Now;
             ShoppingCartVM.OrderHeader.ApplicationUserId = userId;
                
@@ -103,6 +131,7 @@ namespace Fragrance.Areas.Costumer.Controllers
             {
                 cart.Price = GetPriceBasedOnQuantity(cart);
                 ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+                
             }
 
             if(applicationUsers.CompanyId.GetValueOrDefault() == 0) 
@@ -181,69 +210,142 @@ namespace Fragrance.Areas.Costumer.Controllers
         public IActionResult OrderConfirmation(int id)
         {
             OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id, includeProperties: "ApplicationUser");
-            if(orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
+            var orderDetails = _unitOfWork.OrderDetail.GetAll(od => od.OrderHeaderId == id, includeProperties: "Parfume");
+
+            // Check stock availability
+            foreach (var detail in orderDetails)
             {
-                //this is and order by costumer
+                if (detail.Parfume.Quantity < detail.Count)
+                {
+                    // Handle insufficient stock scenario
+                    _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusCancelled, SD.PaymentStatusRejected);
+                    _unitOfWork.Save();
+
+                    TempData["Notification"] = $"error|{detail.Parfume.Name} is no longer available in the requested quantity. Your order has been cancelled.";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            
+            if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
+            {
+                // For immediate payment orders
                 var service = new SessionService();
                 Session session = service.Get(orderHeader.SessionId);
 
-                if(session.PaymentStatus.ToLower() == "paid")
+                if (session.PaymentStatus.ToLower() == "paid")
                 {
+                    // Only update payment status, keep order status as Pending for admin approval
                     _unitOfWork.OrderHeader.UpdateStripePaymentId(id, session.Id, session.PaymentIntentId);
-                    _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
+                    _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusPending, SD.PaymentStatusApproved);
                     _unitOfWork.Save();
                 }
                 HttpContext.Session.Clear();
             }
+            else
+            {
+                // For company users with delayed payment
+                // Keep status as Pending for admin approval
+                _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusPending, SD.PaymentStatusDelayedPayment);
+                _unitOfWork.Save();
+            }
 
-            List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
+            // Don't deduct inventory here - wait for admin approval
+            // Clear cart only after successful payment
+            List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart
+                .GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
             _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
             _unitOfWork.Save();
 
-
             return View(id);
         }
+
         public IActionResult Plus(int cartId)
         {
-            var cartFromDb = _unitOfWork.ShoppingCart.Get(u => u.ShoppingCartId == cartId);
-           
-                cartFromDb.Count += 1;
-                _unitOfWork.ShoppingCart.Update(cartFromDb);
-                _unitOfWork.Save();
+            var cartFromDb = _unitOfWork.ShoppingCart.Get(u => u.ShoppingCartId == cartId, includeProperties: "Parfume");
             
+            if (cartFromDb.Parfume.Quantity > 0)
+            {
+                cartFromDb.Count += 1;
+                if (cartFromDb.Count == cartFromDb.Parfume.Quantity)
+                {
+                    TempData["Notification"] = $"error|Only {cartFromDb.Parfume.Quantity} items available in stock.";
+
+                }
+                else
+                {
+                   cartFromDb.Price = GetPriceBasedOnQuantity(cartFromDb);
+                    _unitOfWork.ShoppingCart.Update(cartFromDb);
+                    _unitOfWork.Save();
+                    TempData["Notification"] = "success|Item quantity increased!";
+                }
+
+            }
             return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Minus(int cartId)
         {
             var cartFromDb = _unitOfWork.ShoppingCart.Get(u => u.ShoppingCartId == cartId);
-           
-                if (cartFromDb.Count <= 1)
-                {
-                _unitOfWork.ShoppingCart.Remove(cartFromDb);
-                HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart
-                    .GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count() - 1);
 
-                }
-                else
-                {
-                   cartFromDb.Count -= 1;
-                    _unitOfWork.ShoppingCart.Update(cartFromDb);
-                }
-                _unitOfWork.Save();
-            
+            if (cartFromDb.Count <= 1)
+            {
+                _unitOfWork.ShoppingCart.Remove(cartFromDb);
+                HttpContext.Session.SetInt32(SD.SessionCart,
+                    _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count() - 1);
+                TempData["Notification"] = "success|Item removed from cart!";
+            }
+            else
+            {
+                cartFromDb.Count -= 1;
+                _unitOfWork.ShoppingCart.Update(cartFromDb);
+                TempData["Notification"] = "success|Item quantity decreased!";
+            }
+
+            _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Remove(int cartId)
         {
             var cartFromDb = _unitOfWork.ShoppingCart.Get(u => u.ShoppingCartId == cartId);
-           _unitOfWork.ShoppingCart.Remove(cartFromDb);
-            HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count() - 1);
+            _unitOfWork.ShoppingCart.Remove(cartFromDb);
+            HttpContext.Session.SetInt32(SD.SessionCart,
+                _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count() - 1);
             _unitOfWork.Save();
-                
+            TempData["Notification"] = "success|Item removed from cart!";
+
             return RedirectToAction(nameof(Index));
         }
+        [HttpPost]
+        public IActionResult UpdateCart(int cartId, int count)
+        {
+            var cartFromDb = _unitOfWork.ShoppingCart.Get(u => u.ShoppingCartId == cartId, includeProperties: "Parfume");
+
+            if (cartFromDb.Parfume.Quantity >= count)
+            {
+                cartFromDb.Count = count;
+                _unitOfWork.ShoppingCart.Update(cartFromDb);
+                _unitOfWork.Save();
+                TempData["Notification"] = "success|Cart updated successfully!";
+            }
+            else
+            {
+                TempData["Notification"] = $"error|Only {cartFromDb.Parfume.Quantity} items available in stock.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        //public IActionResult Remove(int cartId)
+        //{
+        //    var cartFromDb = _unitOfWork.ShoppingCart.Get(u => u.ShoppingCartId == cartId);
+        //   _unitOfWork.ShoppingCart.Remove(cartFromDb);
+        //    HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count() - 1);
+        //    _unitOfWork.Save();
+
+        //    return RedirectToAction(nameof(Index));
+        //}
 
 
 
