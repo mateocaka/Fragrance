@@ -1,51 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using Fragrance.Data;
 using Fragrance.DataAccess.Repository.IRepository;
-using Fragrance.DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Fragrance.DataAccess.Repository
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-
         private readonly ApplicationDbContext _db;
         internal DbSet<T> dbSet;
+
         public Repository(ApplicationDbContext db)
         {
-
             _db = db;
             this.dbSet = _db.Set<T>();
-            
-            _db.Parfumes.Include(u => u.ParfumeId);
+            // Hiq linjën e mëposhtme nëse nuk keni relacion që kërkon Include
+            // _db.Parfumes.Include(u => u.ParfumeId);
         }
 
-
-        public void Add(T entity)
-        {
-            dbSet.Add(entity);
-        }
+        public void Add(T entity) => dbSet.Add(entity);
 
         public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
         {
-            IQueryable<T> query;
-            if (tracked)
-            {
-                query = dbSet;
-            }
-            else
-            {
-                query = dbSet.AsNoTracking();
-            }
+            IQueryable<T> query = tracked ? dbSet : dbSet.AsNoTracking();
             query = query.Where(filter);
-            if (!String.IsNullOrEmpty(includeProperties))
+
+            if (!string.IsNullOrEmpty(includeProperties))
             {
-                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProp in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(includeProp);
                 }
@@ -53,18 +39,14 @@ namespace Fragrance.DataAccess.Repository
             return query.FirstOrDefault()!;
         }
 
-
-        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter, string? includeProperties = null)
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
+            if (filter != null) query = query.Where(filter);
 
-            if (!String.IsNullOrEmpty(includeProperties))
+            if (!string.IsNullOrEmpty(includeProperties))
             {
-                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProp in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(includeProp);
                 }
@@ -72,14 +54,37 @@ namespace Fragrance.DataAccess.Repository
             return query.ToList();
         }
 
-        public void Remove(T entity)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
         {
-            dbSet.Remove(entity);
+            IQueryable<T> query = dbSet;
+            if (filter != null) query = query.Where(filter);
+
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProp in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProp);
+                }
+            }
+            return await query.ToListAsync();
         }
 
-        public void RemoveRange(IEnumerable<T> entitiy)
+        public async Task<T> GetAsync(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
         {
-            dbSet.RemoveRange(entitiy);
+            IQueryable<T> query = tracked ? dbSet : dbSet.AsNoTracking();
+            query = query.Where(filter);
+
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProp in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProp);
+                }
+            }
+            return await query.FirstOrDefaultAsync()!;
         }
+
+        public void Remove(T entity) => dbSet.Remove(entity);
+        public void RemoveRange(IEnumerable<T> entity) => dbSet.RemoveRange(entity);
     }
 }
