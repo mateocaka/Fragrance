@@ -21,7 +21,7 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '3.1'
+          dotnet-version: '9.x'
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
@@ -41,23 +41,13 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
+    
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
       
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B84365652A2C48FFA453C9966D08B6EA }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B4A4CB1BA9C3468DBAA471C11186B201 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9CF38EA68AF94557B094A67317EDAB16 }}
-
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -65,4 +55,4 @@ jobs:
           app-name: 'Fragrance'
           slot-name: 'Production'
           package: .
-          
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FA26297F697E47B28CAF41B1B841EF51 }}
