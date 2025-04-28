@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Fragrance.Models\Fragrance.Models.csproj" />
+    <ProjectReference Include="..\Fragrance.Utility\Fragrance.Utility.csproj" />
   </ItemGroup>
 
 </Project>

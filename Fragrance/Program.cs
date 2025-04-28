@@ -1,14 +1,18 @@
-using Fragrance.Data;
 using Fragrance.DataAccess.Repository;
 using Fragrance.DataAccess.Repository.IRepository;
-using Fragrance.Models;
-using Fragrance.Utility;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
+using Fragrance.DataAccess;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.EntityFrameworkCore;
+using Fragrance.Utility;
 using Stripe;
+using Fragrance.DataAccess.DbInitializer;
+using Fragrance.Data;
+using Fragrance.DataAccess.DbInitializer;
+using Fragrance.DataAccess.Repository.IRepository;
+using Fragrance.DataAccess.Repository;
+using Fragrance.Utility;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,21 +23,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
 
-// Identity configuration
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-    options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
-// Cookie configuration
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.LoginPath = "/Identity/Account/Login";
-    options.LogoutPath = "/Identity/Account/Logout";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.ConfigureApplicationCookie(options => {
+    options.LoginPath = $"/Identity/Account/Login";
+    options.LogoutPath = $"/Identity/Account/Logout";
+    options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
 });
-
-// Authentication configuration
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -57,61 +52,48 @@ builder.Services.AddAuthentication(options =>
     options.RetrieveUserDetails = true;
 });
 
-// Session and other services
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
+builder.Services.AddSession(options => {
     options.IdleTimeout = TimeSpan.FromMinutes(100);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-// Register IHttpClientFactory with named client for Dashboard API
-builder.Services.AddHttpClient("DashboardApi", client =>
-{
-    client.BaseAddress = new Uri("https://localhost:7046/api/DashboardApi/");
-    client.Timeout = TimeSpan.FromSeconds(30);
-});
-
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddRazorPages();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
-builder.Services.AddRazorPages();
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
 app.UseStaticFiles();
+StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
-
+SeedDatabase();
+app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Costumer}/{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages();
-app.MapControllers(); // Ensure API controllers are mapped
-
-// Seed data
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    
-    var unitOfWork = services.GetRequiredService<IUnitOfWork>();
- 
-   
-}
-
 app.Run();
 
+
+void SeedDatabase()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        dbInitializer.Initialize();
+    }
+}
