@@ -34,23 +34,25 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
-.AddCookie()
+.AddCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.LogoutPath = "/Identity/Account/Logout";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+})
 .AddFacebook(options =>
 {
-    options.AppId = "531484386144763";
-    options.AppSecret = "9bb337d930842fd5bf2c497c37cf81b4";
+    options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+ 
 })
 .AddGoogle(options =>
 {
-    options.ClientId = "640937380930-m0up3a52qe5gh4o8psm10107ak12p2nc.apps.googleusercontent.com";
-    options.ClientSecret = "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";
-})
-.AddTwitter(options =>
-{
-    options.ConsumerKey = "tVYLg4Sxiq5SQfB7RjeQIDH69";
-    options.ConsumerSecret = "iAMZfqPcoSMVIwkBOfKHSI0vuLvb9VPBBIm6t76xv6a77pErF0";
-    options.RetrieveUserDetails = true;
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+   
 });
+
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options => {
@@ -79,6 +81,7 @@ StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey"
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseSession();
 SeedDatabase();
 app.MapRazorPages();
