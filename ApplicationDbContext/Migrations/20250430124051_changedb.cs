@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Fragrance.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class addtodatabaz : Migration
+    public partial class changedb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -62,7 +62,12 @@ namespace Fragrance.DataAccess.Migrations
                     Price = table.Column<double>(type: "float", nullable: false),
                     Price50 = table.Column<double>(type: "float", nullable: false),
                     Price100 = table.Column<double>(type: "float", nullable: false),
-                    ImgUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ImgUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Size30 = table.Column<int>(type: "int", nullable: false),
+                    Size50 = table.Column<int>(type: "int", nullable: false),
+                    Size100 = table.Column<int>(type: "int", nullable: false),
+                    Rating = table.Column<double>(type: "float", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -304,19 +309,19 @@ namespace Fragrance.DataAccess.Migrations
 
             migrationBuilder.InsertData(
                 table: "Parfumes",
-                columns: new[] { "ParfumeId", "Author", "BaseNotes", "Gender", "ImgUrl", "ListPrice", "MiddleNotes", "Name", "Price", "Price100", "Price50", "TopNotes", "description" },
+                columns: new[] { "ParfumeId", "Author", "BaseNotes", "Gender", "ImgUrl", "ListPrice", "MiddleNotes", "Name", "Price", "Price100", "Price50", "Quantity", "Rating", "Size100", "Size30", "Size50", "TopNotes", "description" },
                 values: new object[,]
                 {
-                    { 1, "Jean Paul Gaultier", "Tonka Bean,Amber", "Male", "", 120.0, "Vanilla,Benzoin", "Le Male Elixir", 100.0, 80.0, 90.0, "Cardamom,Lavender", "A bold and intense fragrance." },
-                    { 2, "Parfume de Marly", "Vanilla,Cedarwood", "Unisex", "", 150.0, "Tobacco,Incense", "Herod", 140.0, 120.0, 130.0, "Cinnamon,Pepper", "A sweet and spicy fragrance with tobacco notes." },
-                    { 3, "Viktor Rolf", "Tobacco,Vanilla", "Male", "", 110.0, "Cinnamon,Saffron", "Spicebomb Extreme", 100.0, 85.0, 90.0, "Pepper,Grapefruit", "A powerful and warm spicy scent." },
-                    { 4, "Maison Margiela", "Tobacco,Vanilla", "Male", "", 130.0, "Rum,Clary Sage", "Jazz Club", 120.0, 100.0, 110.0, "Pink Pepper,Neroli", "A warm and cozy fragrance with boozy notes." },
-                    { 5, "Armani", "Vanilla,Tonka Bean", "Male", "", 140.0, "Lavender,Sage", "Stronger With You Intensely", 130.0, 110.0, 120.0, "Pink Pepper,Juniper", "A sweet and gourmand fragrance." },
-                    { 6, "Azzaro", "Vanilla,Amber", "Male", "", 150.0, "Wood Accord", "The Most Wanted Parfum", 140.0, 120.0, 130.0, "Ginger,Bergamot", "A warm, woody fragrance with an intense character." },
-                    { 7, "Tom Ford", "Dried Fruits,Wood", "Unisex", "", 200.0, "Vanilla,Cacao", "Tobacco Vanille", 190.0, 170.0, 180.0, "Tobacco Leaf,Spices", "A luxurious blend of tobacco and vanilla." },
-                    { 8, "Tom Ford", "Amber,Moss", "Unisex", "", 160.0, "Leather,Jasmine Sambac", "Ombre Leather", 150.0, 130.0, 140.0, "Cardamom", "A leather fragrance with a bold, smoky feel." },
-                    { 9, "Yves Saint Laurent", "Vetiver,Cedar", "Male", "", 110.0, "Lavender,Bergamot", "La Nuit de L'Homme", 100.0, 90.0, 95.0, "Cardamom", "A seductive fragrance with a blend of spices and woods." },
-                    { 10, "Chanel", "Sandalwood,Cedar", "Male", "", 180.0, "Ginger,Nutmeg", "Bleu de Chanel", 170.0, 150.0, 160.0, "Grapefruit,Lemon", "A fresh, woody fragrance that embodies freedom." }
+                    { 1, "Jean Paul Gaultier", "Tonka Bean,Amber", "Male", "", 120.0, "Vanilla,Benzoin", "Le Male Elixir", 100.0, 80.0, 90.0, 99, 4.0999999999999996, 100, 30, 50, "Cardamom,Lavender", "A bold and intense fragrance." },
+                    { 2, "Parfume de Marly", "Vanilla,Cedarwood", "Unisex", "", 150.0, "Tobacco,Incense", "Herod", 140.0, 120.0, 130.0, 99, 4.7000000000000002, 100, 30, 50, "Cinnamon,Pepper", "A sweet and spicy fragrance with tobacco notes." },
+                    { 3, "Viktor Rolf", "Tobacco,Vanilla", "Male", "", 110.0, "Cinnamon,Saffron", "Spicebomb Extreme", 100.0, 85.0, 90.0, 99, 4.5, 100, 30, 50, "Pepper,Grapefruit", "A powerful and warm spicy scent." },
+                    { 4, "Maison Margiela", "Tobacco,Vanilla", "Male", "", 130.0, "Rum,Clary Sage", "Jazz Club", 120.0, 100.0, 110.0, 99, 4.9000000000000004, 100, 30, 50, "Pink Pepper,Neroli", "A warm and cozy fragrance with boozy notes." },
+                    { 5, "Armani", "Vanilla,Tonka Bean", "Male", "", 140.0, "Lavender,Sage", "Stronger With You Intensely", 130.0, 110.0, 120.0, 99, 4.7999999999999998, 100, 30, 50, "Pink Pepper,Juniper", "A sweet and gourmand fragrance." },
+                    { 6, "Azzaro", "Vanilla,Amber", "Male", "", 150.0, "Wood Accord", "The Most Wanted Parfum", 140.0, 120.0, 130.0, 99, 4.2000000000000002, 100, 30, 50, "Ginger,Bergamot", "A warm, woody fragrance with an intense character." },
+                    { 7, "Tom Ford", "Dried Fruits,Wood", "Unisex", "", 200.0, "Vanilla,Cacao", "Tobacco Vanille", 190.0, 170.0, 180.0, 99, 4.2999999999999998, 100, 30, 50, "Tobacco Leaf,Spices", "A luxurious blend of tobacco and vanilla." },
+                    { 8, "Tom Ford", "Amber,Moss", "Unisex", "", 160.0, "Leather,Jasmine Sambac", "Ombre Leather", 150.0, 130.0, 140.0, 99, 4.0, 100, 30, 50, "Cardamom", "A leather fragrance with a bold, smoky feel." },
+                    { 9, "Yves Saint Laurent", "Vetiver,Cedar", "Male", "", 110.0, "Lavender,Bergamot", "La Nuit de L'Homme", 100.0, 90.0, 95.0, 99, 4.2999999999999998, 100, 30, 50, "Cardamom", "A seductive fragrance with a blend of spices and woods." },
+                    { 10, "Chanel", "Sandalwood,Cedar", "Male", "", 180.0, "Ginger,Nutmeg", "Bleu de Chanel", 170.0, 150.0, 160.0, 99, 4.5, 100, 30, 50, "Grapefruit,Lemon", "A fresh, woody fragrance that embodies freedom." }
                 });
 
             migrationBuilder.CreateIndex(

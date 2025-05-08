@@ -32,6 +32,10 @@ namespace Fragrance.Areas.Identity.Pages.Account
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
+        /// 
+        [BindProperty]
+        public string? RecaptchaToken { get; set; } 
+
         [BindProperty]
         public InputModel Input { get; set; }
 
@@ -105,6 +109,8 @@ namespace Fragrance.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
 
+          
+
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             if (ModelState.IsValid)
@@ -121,11 +127,8 @@ namespace Fragrance.Areas.Identity.Pages.Account
                 {
                     return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
                 }
-                if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
-                }
+               
+              
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");

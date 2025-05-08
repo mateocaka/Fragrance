@@ -8,6 +8,6 @@ namespace Fragrance.DataAccess.DbInitializer
 {
     public interface IDbInitializer
     {
-       void Initialize();
+        void Initialize();
     }
 }

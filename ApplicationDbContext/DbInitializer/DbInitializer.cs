@@ -56,7 +56,7 @@ namespace Fragrance.DataAccess.DbInitializer
                     StreetAddress="123 Admin Street",
                     State="Admin State",
                     PostalCode="123456",
-                    City="Admin City",        
+                    City="Admin City",
                 }, "Admin123*").GetAwaiter().GetResult();
 
 
@@ -65,7 +65,7 @@ namespace Fragrance.DataAccess.DbInitializer
 
             }
             return;
-            
+
         }
 
 
