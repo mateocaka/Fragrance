@@ -89,6 +89,7 @@ namespace Fragrance.Areas.Identity.Pages.Account
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
+          
             public string Email { get; set; }
 
             /// <summary>
@@ -115,6 +116,7 @@ namespace Fragrance.Areas.Identity.Pages.Account
             public IEnumerable<SelectListItem> RoleList {  get; set; }
 
             [Required]
+        
             public string Name {  get; set; }   
             public string? StreetAddress { get; set; }
             public string? City { get; set; }

@@ -9,7 +9,6 @@ namespace Fragrance.DataAccess.Repository.IRepository
     public interface IUnitOfWork
     {
         IParfumeRepository Parfume { get; }
-
         ICompanyRepository Company { get; }
         IShoppingCartRepository ShoppingCart { get; }
         IApplicationUserRepository ApplicationUser { get; }

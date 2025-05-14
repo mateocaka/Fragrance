@@ -7,7 +7,7 @@ $(document).ready(function () {
 function loadDataTable() {
     dataTable = $('#tblData').DataTable({
         "ajax": { url: '/admin/user/getall' },
-        "responsive": true, // Enable responsive behavior
+        "responsive": true, 
         "columns": [
             { "data": "name", "width": "15%" },
             { "data": "email", "width": "15%" },
@@ -33,7 +33,7 @@ function loadDataTable() {
                     `;
                 },
                 "width": "25%",
-                "orderable": false // Disable sorting on this column
+                "orderable": false 
             }
         ]
     });

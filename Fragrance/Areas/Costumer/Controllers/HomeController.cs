@@ -4,17 +4,15 @@ using System.Security.Claims;
 using Fragrance.DataAccess.Repository.IRepository;
 using Fragrance.Models;
 using Fragrance.Models.ViewModels;
+using Fragrance.Rrugetimi;
 using Fragrance.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Fragrance.Areas.Costumer.Controllers
-        
 {
     [Area("Costumer")]
-
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -26,11 +24,20 @@ namespace Fragrance.Areas.Costumer.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index(string search, string gender, string brand, string rating)
+        [MosPranoPaLoginAttribute]
+        public IActionResult Index(string search, string gender, string brand, string rating, int page = 1)
         {
-            var allPerfumes = _unitOfWork.Parfume.GetAll().ToList();
+            // Determine cookie prefix based on authentication status
+            string cookiePrefix = User.Identity.IsAuthenticated ? $"_{User.FindFirst(ClaimTypes.NameIdentifier)?.Value}" : "";
+            var theme = Request.Cookies[$"UserTheme{cookiePrefix}"] ?? "light";
+            var itemsPerPage = int.Parse(Request.Cookies[$"ItemsPerPage{cookiePrefix}"] ?? "10");
 
-          
+            // Pass preferences to the view
+            ViewBag.Theme = theme;
+            ViewBag.ItemsPerPage = itemsPerPage;
+
+            // Fetch and filter perfumes
+            var allPerfumes = _unitOfWork.Parfume.GetAll().ToList();
             var filteredPerfumes = allPerfumes.AsEnumerable();
 
             if (!string.IsNullOrEmpty(search))
@@ -56,7 +63,14 @@ namespace Fragrance.Areas.Costumer.Controllers
                 filteredPerfumes = filteredPerfumes.Where(p => p.Rating >= minRating);
             }
 
-           
+            // Apply pagination
+            var totalItems = filteredPerfumes.Count();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)itemsPerPage);
+            var paginatedPerfumes = filteredPerfumes.Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+
+            // Pass pagination and filter data to the view
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
             ViewBag.OriginalData = allPerfumes;
             ViewBag.Genders = new List<string> { "Male", "Female", "Unisex" };
             ViewBag.Brands = allPerfumes
@@ -65,9 +79,9 @@ namespace Fragrance.Areas.Costumer.Controllers
                 .OrderBy(a => a)
                 .ToList();
 
-            var ratingsList = new List<string> {"1", "2", "3", "4","5" };
+            var ratingsList = new List<string> { "1", "2", "3", "4", "5" };
             ViewBag.Ratings = ratingsList;
-    
+
             ViewBag.CurrentFilters = new
             {
                 Search = search,
@@ -75,25 +89,40 @@ namespace Fragrance.Areas.Costumer.Controllers
                 Brand = brand,
                 Rating = rating
             };
-            if (filteredPerfumes!=null)
-            {
-                return View(filteredPerfumes);
-            }
-            
-            return View(filteredPerfumes);
+
+            return View(paginatedPerfumes);
         }
+
+        public IActionResult SetPreferences(string theme, int itemsPerPage)
+        {
+            var options = new CookieOptions
+            {
+                Expires = DateTime.Now.AddDays(30),
+                IsEssential = true,
+                SameSite = SameSiteMode.Lax,
+                Secure = true
+            };
+
+            // Set cookies with user-specific prefix if authenticated
+            string cookiePrefix = User.Identity.IsAuthenticated ? $"_{User.FindFirst(ClaimTypes.NameIdentifier)?.Value}" : "";
+            Response.Cookies.Append($"UserTheme{cookiePrefix}", theme, options);
+            Response.Cookies.Append($"ItemsPerPage{cookiePrefix}", itemsPerPage.ToString(), options);
+
+            return RedirectToAction("Index");
+        }
+
+        [MosPranoPaLoginAttribute]
         public IActionResult Details(int parfumeid)
-        {        
+        {
             ShoppingCart cart = new()
             {
                 Parfume = _unitOfWork.Parfume.Get(u => u.ParfumeId == parfumeid),
                 Count = 1,
                 ParfumeId = parfumeid,
             };
-
-
             return View(cart);
         }
+
         public IActionResult SoldOUT(int parfumeid)
         {
             ShoppingCart cart = new()
@@ -102,11 +131,11 @@ namespace Fragrance.Areas.Costumer.Controllers
                 Count = 1,
                 ParfumeId = parfumeid,
             };
-
-
             return View(cart);
         }
+
         [HttpPost]
+        [MosPranoPaLoginAttribute]
         [Authorize]
         public IActionResult Details(ShoppingCart shoppingCart)
         {
@@ -115,45 +144,36 @@ namespace Fragrance.Areas.Costumer.Controllers
             shoppingCart.ApplicationUserId = userId;
             var parfume = _unitOfWork.Parfume.Get(u => u.ParfumeId == shoppingCart.ParfumeId);
 
-            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.Get(u =>
-                u.ApplicationUserId == userId && u.ParfumeId == shoppingCart.ParfumeId);
             if (shoppingCart.Count > parfume.Quantity)
             {
                 TempData["Notification"] = "error|Not enough stock available";
                 return RedirectToAction(nameof(Index));
             }
+
+            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.Get(u =>
+                u.ApplicationUserId == userId && u.ParfumeId == shoppingCart.ParfumeId);
+
             if (cartFromDb != null)
             {
-                
                 cartFromDb.Count += shoppingCart.Count;
-               
                 _unitOfWork.ShoppingCart.Update(cartFromDb);
                 _unitOfWork.Save();
             }
             else
             {
-                //add cart and also add session
-               
                 _unitOfWork.ShoppingCart.Add(shoppingCart);
                 _unitOfWork.Save();
-                HttpContext.Session.SetInt32(SD.SessionCart, 
-                _unitOfWork.ShoppingCart.GetAll(u =>
-                u.ApplicationUserId == userId).Count());
+                HttpContext.Session.SetInt32(SD.SessionCart,
+                    _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId).Count());
             }
-            TempData["Notification"] = "success|Cart update successfully";
 
-
-            _unitOfWork.Save();
+            TempData["Notification"] = "success|Cart updated successfully";
             return RedirectToAction(nameof(Index));
         }
 
-      
-
-
-
+        [MosPranoPaLoginAttribute]
         public IActionResult Privacy()
         {
-
             return View();
         }
 

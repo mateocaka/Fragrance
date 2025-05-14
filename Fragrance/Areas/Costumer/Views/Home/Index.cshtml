@@ -4,8 +4,18 @@
     var originalData = ViewBag.OriginalData as List<Parfume>;
 }
 
+
+@if (Context.Request.Cookies["CookieConsent"] != "true")
+{
+    <div id="cookieConsent" class="cookie-banner">
+        This website uses cookies to enhance the user experience.
+        <button onclick="acceptCookies()">Accept</button>
+    </div>
+}
+
 <div class="container-fluid">
     <header class="text-center">
+       
         <form method="get" class="mt-3 col-md-6 mx-auto">
             <div class="input-group">
                 <div class="form-control d-flex flex-wrap align-items-center" style="gap: 5px; min-height: 50px;">
@@ -38,8 +48,7 @@
                     @if (!string.IsNullOrEmpty(currentFilters.Rating))
                     {
                         var starRating = string.Concat(Enumerable.Repeat("⭐", int.Parse(currentFilters.Rating)));
-
-                        <div class="badge bg-primary  d-flex align-items-center">
+                        <div class="badge bg-primary d-flex align-items-center">
                             @starRating
                             <a href="@Url.Action("Index", new {
                                  search = currentFilters.Search,
@@ -50,18 +59,12 @@
                             </a>
                         </div>
                     }
-                    <input type="search"
-                    class="border-0 flex-grow-1"
-                    name="search"
-                    placeholder="Search perfumes, brands..."
-                    value="@currentFilters.Search"
-                    style="min-width: 200px; outline: none">
+                    <input type="search" class="border-0 flex-grow-1" name="search" placeholder="Search perfumes, brands..." value="@currentFilters.Search" style="min-width: 200px; outline: none">
                 </div>
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-search"></i>
                 </button>
             </div>
-
             @if (!string.IsNullOrEmpty(currentFilters.Gender))
             {
                 <input type="hidden" name="gender" value="@currentFilters.Gender">
@@ -75,19 +78,35 @@
                 <input type="hidden" name="rating" value="@currentFilters.Rating">
             }
         </form>
+
+      
+        <div class="mt-3">
+            <form asp-action="SetPreferences" method="get" class="d-inline">
+                <input type="hidden" name="theme" value="light" />
+                <input type="hidden" name="itemsPerPage" value="@ViewBag.ItemsPerPage" />
+                <button type="submit" class="btn btn-light">Light Theme</button>
+            </form>
+            <form asp-action="SetPreferences" method="get" class="d-inline">
+                <input type="hidden" name="theme" value="dark" />
+                <input type="hidden" name="itemsPerPage" value="@ViewBag.ItemsPerPage" />
+                <button type="submit" class="btn btn-dark">Dark Theme</button>
+            </form>
+        </div>
+
+    
     </header>
 
     <div class="container mt-4">
         <div class="row">
+           
             <div class="col-md-3">
                 <h4>
                     <a href="@Url.Action("Index")" class="text-decoration-none">
-
                         <h3 class="text-info-emphasis">CLEAR ALL FILTERS</h3>
                     </a>
                 </h4>
 
-                <h5 class="mt-3">GENDER</h5>
+                <h5 class="mt-3" data-translate="gender">GENDER</h5>
                 <div class="btn-group-vertical w-100">
                     @foreach (var g in ViewBag.Genders)
                     {
@@ -102,7 +121,7 @@
                     }
                 </div>
 
-                <h5 class="mt-4">DESIGNERS</h5>
+                <h5 class="mt-4" data-translate="designers">DESIGNERS</h5>
                 <input type="text" id="brandSearch" class="form-control" placeholder="Search for designers">
                 <div class="list-group mt-2" id="brandList">
                     @foreach (var brand in ViewBag.Brands)
@@ -118,34 +137,33 @@
                     }
                 </div>
 
-                <h5 class="mt-4">RATING</h5>
+                <h5 class="mt-4" data-translate="rating">RATING</h5>
                 <div class="btn-group-vertical w-100">
                     @{
-
                         var ratingMap = new Dictionary<string, string>
-                    {
-                    {"1", "⭐"},
-                    {"2", "⭐⭐"},
-                    {"3", "⭐⭐⭐"},
-                    {"4", "⭐⭐⭐⭐"},
-                    {"5", "⭐⭐⭐⭐⭐"}
-                    };
+                        {
+                            {"1", "⭐"},
+                            {"2", "⭐⭐"},
+                            {"3", "⭐⭐⭐"},
+                            {"4", "⭐⭐⭐⭐"},
+                            {"5", "⭐⭐⭐⭐⭐"}
+                        };
                     }
-
                     @foreach (var r in ViewBag.Ratings)
                     {
                         <a href="@Url.Action("Index", new {
-            search = currentFilters.Search,
-            gender = currentFilters.Gender,
-            brand = currentFilters.Brand,
-            rating = r
-        })" class="btn @(currentFilters.Rating == r ? "btn-primary" : "btn-outline-secondary") text-start">
-                            @ratingMap[r]+ 
+                            search = currentFilters.Search,
+                            gender = currentFilters.Gender,
+                            brand = currentFilters.Brand,
+                            rating = r
+                        })" class="btn @(currentFilters.Rating == r ? "btn-primary" : "btn-outline-secondary") text-start">
+                            @ratingMap[r]+
                         </a>
                     }
                 </div>
             </div>
 
+          
             <div class="col-md-9">
                 <div class="row">
                     @foreach (var parfume in Model)
@@ -175,6 +193,30 @@
                         </div>
                     }
                 </div>
+
+               
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, search = currentFilters.Search, gender = currentFilters.Gender, brand = currentFilters.Brand, rating = currentFilters.Rating })">Previous</a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { page = i, search = currentFilters.Search, gender = currentFilters.Gender, brand = currentFilters.Brand, rating = currentFilters.Rating })">@i</a>
+                            </li>
+                        }
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, search = currentFilters.Search, gender = currentFilters.Gender, brand = currentFilters.Brand, rating = currentFilters.Rating })">Next</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
@@ -182,10 +224,14 @@
 
 @section Scripts {
     <script>
+        function acceptCookies() {
+            document.cookie = "CookieConsent=true; path=/; max-age=" + (60 * 60 * 24 * 365);
+            document.getElementById("cookieConsent").style.display = "none";
+        }
+
         document.getElementById('brandSearch').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             const brands = document.getElementById('brandList').getElementsByTagName('a');
-
             Array.from(brands).forEach(brand => {
                 const brandText = brand.textContent.toLowerCase();
                 brand.style.display = brandText.includes(searchTerm) ? 'block' : 'none';

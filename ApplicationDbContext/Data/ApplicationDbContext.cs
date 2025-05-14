@@ -14,7 +14,6 @@ namespace Fragrance.Data
 
         }
         public DbSet<Parfume> Parfumes { get; set; }
-       
         public DbSet<ApplicationUser> applicationUsers { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<ShoppingCart> ShopingCarts { get; set; }

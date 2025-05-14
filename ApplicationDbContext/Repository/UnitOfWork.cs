@@ -21,13 +21,12 @@ namespace Fragrance.DataAccess.Repository
         public ICompanyRepository Company { get; private set; }
         public IShoppingCartRepository ShoppingCart { get; private set; }
         public IApplicationUserRepository ApplicationUser { get; private set; }
-
         public IOrderHeaderRepository OrderHeader { get; private set; } 
         public IOrderDetailRepository OrderDetail { get; private set; }
         public UnitOfWork(ApplicationDbContext db) 
         {
             _db = db;
-            Parfume = new ParfumeRepository(_db);
+            Parfume = new ParfumeRepository(_db);           
             Company = new CompanyRepository(_db);
             ApplicationUser = new ApplicationUserRepository(_db);
             ShoppingCart = new ShoppingCartRepository(_db);
