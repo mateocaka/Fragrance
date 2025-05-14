@@ -7,8 +7,12 @@ using Fragrance.DataAccess.DbInitializer;
 using Fragrance.DataAccess.Repository.IRepository;
 using Fragrance.DataAccess.Repository;
 using Fragrance.Utility;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri")!);
+builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
