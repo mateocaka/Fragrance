@@ -15,6 +15,7 @@ namespace Fragrance.Controllers.Api
     {
         private readonly IUnitOfWork _unitOfWork;
         private const string ApprovedStatus = SD.StatusApproved;
+        private const string ShippedStatus = SD.StatusShipped;
 
         public DashboardApiController(IUnitOfWork unitOfWork)
         {
@@ -25,7 +26,10 @@ namespace Fragrance.Controllers.Api
         public async Task<IActionResult> GetTotalUsers()
         {
             var users = await _unitOfWork.ApplicationUser.GetAllAsync();
-            return Ok(users.Count());
+            return Ok(
+
+              users.Count());
+           
         }
 
         [HttpGet("monthly-sales")]
@@ -35,12 +39,12 @@ namespace Fragrance.Controllers.Api
             var lastMonth = currentMonth.AddMonths(-1);
 
             Expression<Func<OrderHeader, bool>> currentFilter = o =>
-                o.OrderStatus == ApprovedStatus &&
+                (o.OrderStatus == ApprovedStatus || o.OrderStatus == ShippedStatus) && // Both statuses
                 o.OrderDate.Year == currentMonth.Year &&
                 o.OrderDate.Month == currentMonth.Month;
 
             Expression<Func<OrderHeader, bool>> lastFilter = o =>
-                o.OrderStatus == ApprovedStatus &&
+                (o.OrderStatus == ApprovedStatus || o.OrderStatus == ShippedStatus) && // Both statuses
                 o.OrderDate.Year == lastMonth.Year &&
                 o.OrderDate.Month == lastMonth.Month;
 
@@ -56,37 +60,41 @@ namespace Fragrance.Controllers.Api
             return Ok(new
             {
                 TotalSales = currentMonthSales,
-                PercentageChange = percentageChange
+                PercentageChange = percentageChange,
+                StatusesUsed = new[] { ApprovedStatus, ShippedStatus } // Explicitly note usage
             });
         }
 
         [HttpGet("total-orders")]
         public async Task<IActionResult> GetTotalOrders()
         {
-            var approvedOrders = await _unitOfWork.OrderHeader.GetAllAsync(o => o.OrderStatus == ApprovedStatus);
-            return Ok(approvedOrders.Count());
+            var orders = await _unitOfWork.OrderHeader.GetAllAsync(o =>
+                o.OrderStatus == ApprovedStatus || o.OrderStatus == ShippedStatus); // Both statuses
+            return Ok(
+
+                orders.Count());
+               
+            
         }
 
         [HttpGet("products")]
         public async Task<IActionResult> GetProducts()
         {
-            // Get all approved order headers first
-            var approvedOrderHeaders = await _unitOfWork.OrderHeader
-                .GetAllAsync(o => o.OrderStatus == ApprovedStatus);
+            var orderHeaders = await _unitOfWork.OrderHeader
+                .GetAllAsync(o => o.OrderStatus == ApprovedStatus || o.OrderStatus == ShippedStatus); // Both statuses
 
-            // Get their IDs
-            var approvedOrderIds = approvedOrderHeaders.Select(o => o.Id);
+            var orderIds = orderHeaders.Select(o => o.Id);
 
-            // Get order details for approved orders only
             var products = (await _unitOfWork.OrderDetail
-                    .GetAllAsync(od => approvedOrderIds.Contains(od.OrderHeaderId),
+                    .GetAllAsync(od => orderIds.Contains(od.OrderHeaderId),
                                includeProperties: "Parfume"))
                 .GroupBy(od => new { od.ParfumeId, od.Parfume.Name, od.Price })
                 .Select(g => new
                 {
                     Name = g.Key.Name ?? "Unknown",
                     Quantity = g.Sum(od => od.Count),
-                    Price = g.Key.Price
+                    Price = g.Key.Price,
+                    Statuses = new { ApprovedStatus, ShippedStatus } // Include in response
                 })
                 .ToList();
 
@@ -97,13 +105,14 @@ namespace Fragrance.Controllers.Api
         public async Task<IActionResult> GetOrdersPerMonth()
         {
             var orders = (await _unitOfWork.OrderHeader
-                    .GetAllAsync(o => o.OrderStatus == ApprovedStatus))
+                    .GetAllAsync(o => o.OrderStatus == ApprovedStatus || o.OrderStatus == ShippedStatus)) // Both statuses
                 .GroupBy(o => new { o.OrderDate.Year, o.OrderDate.Month })
                 .Select(g => new
                 {
                     Year = g.Key.Year,
                     Month = g.Key.Month,
-                    Count = g.Count()
+                    Count = g.Count(),
+                    Statuses = new { ApprovedStatus, ShippedStatus } // Include in response
                 })
                 .OrderBy(g => g.Year).ThenBy(g => g.Month)
                 .ToList();
@@ -114,16 +123,17 @@ namespace Fragrance.Controllers.Api
         [HttpGet("sales-2025")]
         public async Task<IActionResult> GetSales2025()
         {
-            Expression<Func<OrderHeader, bool>> sales2025Filter = o =>
-                o.OrderStatus == ApprovedStatus &&
+            Expression<Func<OrderHeader, bool>> filter = o =>
+                (o.OrderStatus == ApprovedStatus || o.OrderStatus == ShippedStatus) && // Both statuses
                 o.OrderDate.Year == 2025;
 
-            var sales = (await _unitOfWork.OrderHeader.GetAllAsync(sales2025Filter))
+            var sales = (await _unitOfWork.OrderHeader.GetAllAsync(filter))
                 .GroupBy(o => o.OrderDate.Month)
                 .Select(g => new
                 {
                     Month = g.Key,
-                    Total = g.Sum(o => o.OrderTotal)
+                    Total = g.Sum(o => o.OrderTotal),
+                    Statuses = new { ApprovedStatus, ShippedStatus } // Include in response
                 })
                 .OrderBy(g => g.Month)
                 .ToList();

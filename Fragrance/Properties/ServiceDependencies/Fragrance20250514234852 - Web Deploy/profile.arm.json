@@ -21,7 +21,7 @@
     },
     "resourceName": {
       "type": "string",
-      "defaultValue": "Fragrance20250514180248",
+      "defaultValue": "Fragrance20250514234852",
       "metadata": {
         "description": "Name of the main resource to be created by this template."
       }
