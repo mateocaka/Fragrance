@@ -21,7 +21,10 @@ namespace Fragrance.DataAccess.Repository
             // Hiq linjën e mëposhtme nëse nuk keni relacion që kërkon Include
             // _db.Parfumes.Include(u => u.ParfumeId);
         }
-
+        public IQueryable<T> GetAll()
+        {
+            return dbSet.AsQueryable();
+        }
         public void Add(T entity) => dbSet.Add(entity);
 
         public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)

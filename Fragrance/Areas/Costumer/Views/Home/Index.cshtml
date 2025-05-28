@@ -4,57 +4,77 @@
     var originalData = ViewBag.OriginalData as List<Parfume>;
 }
 
-
+<!-- Cookie consent banner -->
 @if (Context.Request.Cookies["CookieConsent"] != "true")
 {
-    <div id="cookieConsent" class="cookie-banner">
-        This website uses cookies to enhance the user experience.
-        <button onclick="acceptCookies()">Accept</button>
+    <div id="cookieConsent" class="cookie-banner position-fixed bottom-0 start-50 translate-middle-x w-100" style="z-index: 1000;">
+        <div class="container bg-light p-4 rounded shadow-lg" style="max-width: 600px; border: 1px solid #dee2e6;">
+            <div class="row align-items-center">
+                <div class="col-md-8 mb-3 mb-md-0">
+                    <h5 class="mb-2">We value your privacy</h5>
+                    <p class="mb-0" style="font-size: 0.9rem;">
+                        This website uses cookies to enhance your browsing experience and provide personalized content.
+                        You can manage your preferences below.
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button onclick="declineCookies()" class="btn btn-outline-secondary me-2">Decline</button>
+                    <button onclick="acceptCookies()" class="btn btn-primary">Accept</button>
+                </div>
+            </div>
+        </div>
     </div>
 }
 
 <div class="container-fluid">
     <header class="text-center">
-       
+        <!-- Search form (unchanged) -->
         <form method="get" class="mt-3 col-md-6 mx-auto">
             <div class="input-group">
                 <div class="form-control d-flex flex-wrap align-items-center" style="gap: 5px; min-height: 50px;">
-                    @if (!string.IsNullOrEmpty(currentFilters.Gender))
-                    {
-                        <div class="badge bg-primary d-flex align-items-center">
-                            @currentFilters.Gender
-                            <a href="@Url.Action("Index", new {
-                                search = currentFilters.Search,
-                                brand = currentFilters.Brand,
-                                rating = currentFilters.Rating
-                            })" class="text-white ms-2">
-                                <i class="bi bi-x-lg"></i>
-                            </a>
-                        </div>
-                    }
+                    @* Brand Filter Badge *@
                     @if (!string.IsNullOrEmpty(currentFilters.Brand))
                     {
                         <div class="badge bg-primary d-flex align-items-center">
                             @currentFilters.Brand
                             <a href="@Url.Action("Index", new {
-                                search = currentFilters.Search,
-                                gender = currentFilters.Gender,
-                                rating = currentFilters.Rating
-                            })" class="text-white ms-2">
+            brand = (string)null, // Explicitly nullify
+            search = currentFilters.Search,
+            gender = currentFilters.Gender,
+            rating = currentFilters.Rating
+        })" class="text-white ms-2">
                                 <i class="bi bi-x-lg"></i>
                             </a>
                         </div>
                     }
+
+                    @* Gender Filter Badge *@
+                    @if (!string.IsNullOrEmpty(currentFilters.Gender))
+                    {
+                        <div class="badge bg-primary d-flex align-items-center">
+                            @currentFilters.Gender
+                            <a href="@Url.Action("Index", new {
+            gender = (string)null, // Explicitly nullify
+            search = currentFilters.Search,
+            brand = currentFilters.Brand,
+            rating = currentFilters.Rating
+        })" class="text-white ms-2">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        </div>
+                    }
+                    @* Rating Filter Badge *@
                     @if (!string.IsNullOrEmpty(currentFilters.Rating))
                     {
                         var starRating = string.Concat(Enumerable.Repeat("⭐", int.Parse(currentFilters.Rating)));
                         <div class="badge bg-primary d-flex align-items-center">
                             @starRating
                             <a href="@Url.Action("Index", new {
-                                 search = currentFilters.Search,
-                                 gender = currentFilters.Gender,
-                                brand = currentFilters.Brand
-                                })" class="text-white ms-2">
+            rating = (string)null, // Explicitly nullify
+            search = currentFilters.Search,
+            gender = currentFilters.Gender,
+            brand = currentFilters.Brand
+        })" class="text-white ms-2">
                                 <i class="bi bi-x-lg"></i>
                             </a>
                         </div>
@@ -79,26 +99,14 @@
             }
         </form>
 
-      
-        <div class="mt-3">
-            <form asp-action="SetPreferences" method="get" class="d-inline">
-                <input type="hidden" name="theme" value="light" />
-                <input type="hidden" name="itemsPerPage" value="@ViewBag.ItemsPerPage" />
-                <button type="submit" class="btn btn-light">Light Theme</button>
-            </form>
-            <form asp-action="SetPreferences" method="get" class="d-inline">
-                <input type="hidden" name="theme" value="dark" />
-                <input type="hidden" name="itemsPerPage" value="@ViewBag.ItemsPerPage" />
-                <button type="submit" class="btn btn-dark">Dark Theme</button>
-            </form>
-        </div>
+        <!-- Theme buttons (unchanged) -->
 
-    
+
     </header>
 
     <div class="container mt-4">
         <div class="row">
-           
+            <!-- Filters column -->
             <div class="col-md-3">
                 <h4>
                     <a href="@Url.Action("Index")" class="text-decoration-none">
@@ -106,64 +114,94 @@
                     </a>
                 </h4>
 
-                <h5 class="mt-3" data-translate="gender">GENDER</h5>
+                <!-- Gender filter -->
+                <h5 class="mt-3">GENDER</h5>
                 <div class="btn-group-vertical w-100">
-                    @foreach (var g in ViewBag.Genders)
+                    @foreach (var g in ViewBag.AllGenders)
                     {
-                        <a href="@Url.Action("Index", new {
-                            search = currentFilters.Search,
-                            brand = currentFilters.Brand,
-                            rating = currentFilters.Rating,
-                            gender = g
-                        })" class="btn @(currentFilters.Gender == g ? "btn-primary" : "btn-outline-secondary") text-start">
-                            @g (@originalData.Count(p => p.Gender == g))
-                        </a>
+                        if (ViewBag.AvailableGenders.Contains(g))
+                        {
+                            <a href="@Url.Action("Index", new {
+                                search = currentFilters.Search,
+                                brand = currentFilters.Brand,
+                                rating = currentFilters.Rating,
+                                gender = g
+                            })" class="btn @(currentFilters.Gender == g ? "btn-primary" : "btn-outline-secondary") text-start">
+                                @g (@originalData.Count(p => p.Gender == g))
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="#" class="btn btn-outline-secondary text-start disabled" style="opacity: 0.5;">
+                                @g (@originalData.Count(p => p.Gender == g))
+                            </a>
+                        }
                     }
                 </div>
 
-                <h5 class="mt-4" data-translate="designers">DESIGNERS</h5>
+                <!-- Brand filter -->
+                <h5 class="mt-4">DESIGNERS</h5>
                 <input type="text" id="brandSearch" class="form-control" placeholder="Search for designers">
                 <div class="list-group mt-2" id="brandList">
-                    @foreach (var brand in ViewBag.Brands)
+                    @foreach (var brand in ViewBag.AllBrands)
                     {
-                        <a href="@Url.Action("Index", new {
-                            search = currentFilters.Search,
-                            gender = currentFilters.Gender,
-                            rating = currentFilters.Rating,
-                            brand = brand
-                        })" class="list-group-item list-group-item-action @(currentFilters.Brand == brand ? "active" : "")">
-                            @brand (@originalData.Count(p => p.Author.Equals(brand, StringComparison.OrdinalIgnoreCase)))
-                        </a>
+                        if (ViewBag.AvailableBrands.Contains(brand))
+                        {
+                            <a href="@Url.Action("Index", new {
+                                search = currentFilters.Search,
+                                gender = currentFilters.Gender,
+                                rating = currentFilters.Rating,
+                                brand = brand
+                            })" class="list-group-item list-group-item-action @(currentFilters.Brand == brand ? "active" : "")">
+                                @brand (@originalData.Count(p => p.Author.Equals(brand, StringComparison.OrdinalIgnoreCase)))
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="#" class="list-group-item list-group-item-action disabled" style="opacity: 0.5;">
+                                @brand (@originalData.Count(p => p.Author.Equals(brand, StringComparison.OrdinalIgnoreCase)))
+                            </a>
+                        }
                     }
                 </div>
 
-                <h5 class="mt-4" data-translate="rating">RATING</h5>
+                <!-- Rating filter -->
+                <h5 class="mt-4">RATING</h5>
                 <div class="btn-group-vertical w-100">
                     @{
                         var ratingMap = new Dictionary<string, string>
-                        {
-                            {"1", "⭐"},
-                            {"2", "⭐⭐"},
-                            {"3", "⭐⭐⭐"},
-                            {"4", "⭐⭐⭐⭐"},
-                            {"5", "⭐⭐⭐⭐⭐"}
-                        };
-                    }
-                    @foreach (var r in ViewBag.Ratings)
                     {
-                        <a href="@Url.Action("Index", new {
-                            search = currentFilters.Search,
-                            gender = currentFilters.Gender,
-                            brand = currentFilters.Brand,
-                            rating = r
-                        })" class="btn @(currentFilters.Rating == r ? "btn-primary" : "btn-outline-secondary") text-start">
-                            @ratingMap[r]+
-                        </a>
+                    {"1", "⭐"},
+                    {"2", "⭐⭐"},
+                    {"3", "⭐⭐⭐"},
+                    {"4", "⭐⭐⭐⭐"},
+                    {"5", "⭐⭐⭐⭐⭐"}
+                    };
+                    }
+                    @foreach (var r in ViewBag.AllRatings)
+                    {
+                        if (ViewBag.AvailableRatings.Contains(r))
+                        {
+                            <a href="@Url.Action("Index", new {
+                                search = currentFilters.Search,
+                                gender = currentFilters.Gender,
+                                brand = currentFilters.Brand,
+                                rating = r
+                            })" class="btn @(currentFilters.Rating == r ? "btn-primary" : "btn-outline-secondary") text-start">
+                                @ratingMap[r]
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="#" class="btn btn-outline-secondary text-start disabled" style="opacity: 0.5;">
+                                @ratingMap[r]
+                            </a>
+                        }
                     }
                 </div>
             </div>
 
-          
+            <!-- Perfume listings (unchanged) -->
             <div class="col-md-9">
                 <div class="row">
                     @foreach (var parfume in Model)
@@ -194,7 +232,7 @@
                     }
                 </div>
 
-               
+                <!-- Pagination (unchanged) -->
                 <nav aria-label="Page navigation">
                     <ul class="pagination">
                         @if (ViewBag.CurrentPage > 1)
@@ -224,18 +262,64 @@
 
 @section Scripts {
     <script>
-        function acceptCookies() {
-            document.cookie = "CookieConsent=true; path=/; max-age=" + (60 * 60 * 24 * 365);
-            document.getElementById("cookieConsent").style.display = "none";
-        }
+        document.querySelectorAll('.filter-remove').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = new URL(this.href);
 
-        document.getElementById('brandSearch').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const brands = document.getElementById('brandList').getElementsByTagName('a');
-            Array.from(brands).forEach(brand => {
-                const brandText = brand.textContent.toLowerCase();
-                brand.style.display = brandText.includes(searchTerm) ? 'block' : 'none';
+                // Handle clean URL conversion
+                const newPath = url.pathname
+                    .replace(/\/brand\/[^/]+/, '')
+                    .replace(/\/gender\/[^/]+/, '')
+                    .replace(/\/rating\/[^/]+/, '');
+
+                window.location.href = newPath + url.search;
             });
         });
+        function getCookie(name) {
+                 const value = `; ${document.cookie}`;
+                 const parts = value.split(`; ${name}=`);
+                 if (parts.length === 2) return parts.pop().split(';').shift();
+             }
+
+             function acceptCookies() {
+                 document.cookie = "CookieConsent=true; path=/; max-age=" + (60 * 60 * 24 * 365);
+                 document.getElementById("cookieConsent").style.display = "none";
+             }
+
+             function declineCookies() {
+                 document.cookie = "CookieConsent=false; path=/; max-age=" + (60 * 60 * 24 * 30);
+                 document.getElementById("cookieConsent").style.display = "none";
+             }
+
+             // Block theme changes if cookies are declined
+             document.getElementById("lightThemeForm").addEventListener("submit", function (e) {
+                 if (getCookie("CookieConsent") !== "true") {
+                     e.preventDefault();
+                     alert("Please accept cookies to change the theme.");
+                 }
+             });
+
+             document.getElementById("darkThemeForm").addEventListener("submit", function (e) {
+                 if (getCookie("CookieConsent") !== "true") {
+                     e.preventDefault();
+                     alert("Please accept cookies to change the theme.");
+                 }
+             });
+
+             // Brand search functionality
+             document.getElementById('brandSearch').addEventListener('input', function(e) {
+                 const searchTerm = e.target.value.toLowerCase();
+                 const brands = document.getElementById('brandList').getElementsByTagName('a');
+
+                 Array.from(brands).forEach(brand => {
+                     const brandText = brand.textContent.toLowerCase();
+                     if (!brand.classList.contains('disabled') && brandText.includes(searchTerm)) {
+                         brand.style.display = 'block';
+                     } else {
+                         brand.style.display = 'none';
+                     }
+                 });
+             });
     </script>
 }

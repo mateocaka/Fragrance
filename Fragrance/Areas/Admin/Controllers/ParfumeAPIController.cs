@@ -21,14 +21,14 @@ namespace Fragrance.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: api/ParfumeAPI
+       
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Parfume>>> GetParfumes()
         {
             return await _context.Parfumes.ToListAsync();
         }
 
-        // GET: api/ParfumeAPI/5
+    
         [HttpGet("{id}")]
         public async Task<ActionResult<Parfume>> GetParfume(int id)
         {
@@ -42,8 +42,7 @@ namespace Fragrance.Areas.Admin.Controllers
             return parfume;
         }
 
-        // PUT: api/ParfumeAPI/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutParfume(int id, Parfume parfume)
         {
@@ -73,8 +72,7 @@ namespace Fragrance.Areas.Admin.Controllers
             return NoContent();
         }
 
-        // POST: api/ParfumeAPI
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+       
         [HttpPost]
         public async Task<ActionResult<Parfume>> PostParfume(Parfume parfume)
         {
@@ -84,7 +82,7 @@ namespace Fragrance.Areas.Admin.Controllers
             return CreatedAtAction("GetParfume", new { id = parfume.ParfumeId }, parfume);
         }
 
-        // DELETE: api/ParfumeAPI/5
+     
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteParfume(int id)
         {

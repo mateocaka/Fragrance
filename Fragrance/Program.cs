@@ -9,6 +9,7 @@ using Fragrance.DataAccess.Repository;
 using Fragrance.Utility;
 using Azure.Identity;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -63,12 +64,86 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
+
 SeedDatabase();
 app.MapRazorPages();
+
+app.MapControllerRoute(
+    name: "combinedFilters",
+    pattern: "gender/{gender}/brand/{brand}/rating/{rating}",
+    defaults: new { area = "Costumer", controller = "Home", action = "Index" });
+
+app.MapControllerRoute(
+    name: "genderBrand",
+    pattern: "gender/{gender}/brand/{brand}",
+    defaults: new { area = "Costumer", controller = "Home", action = "Index" });
+
+app.MapControllerRoute(
+    name: "genderRating",
+    pattern: "gender/{gender}/rating/{rating}",
+    defaults: new { area = "Costumer", controller = "Home", action = "Index" });
+
+app.MapControllerRoute(
+    name: "brandRating",
+    pattern: "brand/{brand}/rating/{rating}",
+    defaults: new { area = "Costumer", controller = "Home", action = "Index" });
+
+app.MapControllerRoute(
+    name: "genderOnly",
+    pattern: "gender/{gender}",
+    defaults: new { area = "Costumer", controller = "Home", action = "Index" });
+
+app.MapControllerRoute(
+    name: "brandOnly",
+    pattern: "brand/{brand}",
+    defaults: new { area = "Costumer", controller = "Home", action = "Index" });
+
+app.MapControllerRoute(
+    name: "ratingOnly",
+    pattern: "rating/{rating}",
+    defaults: new { area = "Costumer", controller = "Home", action = "Index" });
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Costumer}/{controller=Home}/{action=Index}/{id?}");
 
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path;
+    var query = context.Request.Query;
+
+    if (query.Any() && !path.Value.Contains("/brand/") &&
+                      !path.Value.Contains("/gender/") &&
+                      !path.Value.Contains("/rating/"))
+    {
+        var segments = new List<string>();
+
+        if (query.ContainsKey("gender"))
+            segments.Add($"gender/{query["gender"]}");
+        if (query.ContainsKey("brand"))
+            segments.Add($"brand/{query["brand"]}");
+        if (query.ContainsKey("rating"))
+            segments.Add($"rating/{query["rating"]}");
+
+        if (segments.Any())
+        {
+            var newPath = $"/{string.Join("/", segments)}";
+            var remainingParams = query.Where(q =>
+                !new[] { "gender", "brand", "rating" }.Contains(q.Key));
+
+            if (remainingParams.Any())
+            {
+                newPath += "?" + string.Join("&",
+                    remainingParams.Select(q => $"{q.Key}={q.Value}"));
+            }
+
+            context.Response.Redirect(newPath);
+            return;
+        }
+    }
+
+    await next();
+});
 app.Run();
 
 

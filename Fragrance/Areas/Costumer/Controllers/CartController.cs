@@ -45,7 +45,7 @@ namespace Fragrance.Areas.Customer.Controllers
             foreach (var cart in ShoppingCartVM.ShoppingCartsList)
             {
                
-                cart.Price = GetPriceBasedOnQuantity(cart);
+                cart.Price = GetPriceBasedOnSize(cart);
                 ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
             }
 
@@ -77,7 +77,7 @@ namespace Fragrance.Areas.Customer.Controllers
 
             foreach (var cart in ShoppingCartVM.ShoppingCartsList)
             {
-                cart.Price = GetPriceBasedOnQuantity(cart);
+                cart.Price = GetPriceBasedOnSize(cart);
                 ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
             }
             return View(ShoppingCartVM);
@@ -101,7 +101,7 @@ namespace Fragrance.Areas.Customer.Controllers
 
             foreach (var cart in ShoppingCartVM.ShoppingCartsList)
             {
-                cart.Price = GetPriceBasedOnQuantity(cart);
+                cart.Price = GetPriceBasedOnSize(cart);
                 
                 ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
             }
@@ -268,22 +268,23 @@ namespace Fragrance.Areas.Customer.Controllers
 
 
 
-        private double GetPriceBasedOnQuantity(ShoppingCart shoppingCart)
+        private double GetPriceBasedOnSize(ShoppingCart shoppingCart)
         {
-            if (shoppingCart.Count <= 50)
+            if (shoppingCart?.Parfume == null)
             {
-                return shoppingCart.Parfume.Price;
+                throw new ArgumentNullException(nameof(shoppingCart.Parfume), "Perfume data is missing");
             }
-            else
+
+            switch (shoppingCart.Size)
             {
-                if (shoppingCart.Count <= 100)
-                {
+                case 30:
+                    return shoppingCart.Parfume.Price;
+                case 50:
                     return shoppingCart.Parfume.Price50;
-                }
-                else
-                {
+                case 100:
                     return shoppingCart.Parfume.Price100;
-                }
+                default:
+                    throw new InvalidOperationException("Invalid size selected");
             }
         }
     }

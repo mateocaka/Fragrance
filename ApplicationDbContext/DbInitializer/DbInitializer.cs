@@ -25,7 +25,7 @@ namespace Fragrance.DataAccess.DbInitializer
         }
         public void Initialize()
         {
-            //migrations if they are not applied
+            
             try
             {
                 if (_db.Database.GetPendingMigrations().Count() > 0)
@@ -35,10 +35,10 @@ namespace Fragrance.DataAccess.DbInitializer
             }
             catch (Exception ex)
             {
-                //log the error
+                
             }
 
-            //create roles if they are not created
+           
             if (!_roleManager.RoleExistsAsync(SD.Role_Customer).GetAwaiter().GetResult())
             {
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer)).GetAwaiter().GetResult();
@@ -46,7 +46,7 @@ namespace Fragrance.DataAccess.DbInitializer
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin)).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Company)).GetAwaiter().GetResult();
 
-                //if roles are not create,then we will create admin use all well 
+                
                 _userManager.CreateAsync(new ApplicationUser
                 {
                     UserName = "admin@dotnetmastery.com",

@@ -4,6 +4,7 @@ using Fragrance.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fragrance.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250520150923_addsizetodb")]
+    partial class addsizetodb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -211,17 +214,6 @@ namespace Fragrance.DataAccess.Migrations
                     b.Property<double>("Rating")
                         .HasColumnType("float");
 
-                    b.Property<string>("ScentNotes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ScentProfile")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Size")
-                        .HasColumnType("int");
-
                     b.Property<int>("Size100")
                         .HasColumnType("int");
 
@@ -261,9 +253,6 @@ namespace Fragrance.DataAccess.Migrations
                             Price50 = 90.0,
                             Quantity = 99,
                             Rating = 4.0999999999999996,
-                            ScentNotes = "Ginger,Vanilla,Amber",
-                            ScentProfile = "Spicy,Woody",
-                            Size = 0,
                             Size100 = 100,
                             Size30 = 30,
                             Size50 = 50,
@@ -285,9 +274,6 @@ namespace Fragrance.DataAccess.Migrations
                             Price50 = 130.0,
                             Quantity = 99,
                             Rating = 4.7000000000000002,
-                            ScentNotes = "Ginger,Vanilla,Amber",
-                            ScentProfile = "Spicy,Woody",
-                            Size = 0,
                             Size100 = 100,
                             Size30 = 30,
                             Size50 = 50,
@@ -309,9 +295,6 @@ namespace Fragrance.DataAccess.Migrations
                             Price50 = 90.0,
                             Quantity = 99,
                             Rating = 4.5,
-                            ScentNotes = "Ginger,Vanilla,Amber",
-                            ScentProfile = "Spicy,Woody",
-                            Size = 0,
                             Size100 = 100,
                             Size30 = 30,
                             Size50 = 50,
@@ -333,9 +316,6 @@ namespace Fragrance.DataAccess.Migrations
                             Price50 = 110.0,
                             Quantity = 99,
                             Rating = 4.9000000000000004,
-                            ScentNotes = "Ginger,Vanilla,Amber",
-                            ScentProfile = "Spicy,Woody",
-                            Size = 0,
                             Size100 = 100,
                             Size30 = 30,
                             Size50 = 50,
@@ -357,9 +337,6 @@ namespace Fragrance.DataAccess.Migrations
                             Price50 = 120.0,
                             Quantity = 99,
                             Rating = 4.7999999999999998,
-                            ScentNotes = "Ginger,Vanilla,Amber",
-                            ScentProfile = "Spicy,Woody",
-                            Size = 0,
                             Size100 = 100,
                             Size30 = 30,
                             Size50 = 50,
@@ -381,9 +358,6 @@ namespace Fragrance.DataAccess.Migrations
                             Price50 = 130.0,
                             Quantity = 99,
                             Rating = 4.2000000000000002,
-                            ScentNotes = "Ginger,Vanilla,Amber",
-                            ScentProfile = "Spicy,Woody",
-                            Size = 0,
                             Size100 = 100,
                             Size30 = 30,
                             Size50 = 50,
@@ -405,9 +379,6 @@ namespace Fragrance.DataAccess.Migrations
                             Price50 = 180.0,
                             Quantity = 99,
                             Rating = 4.2999999999999998,
-                            ScentNotes = "Ginger,Vanilla,Amber",
-                            ScentProfile = "Spicy,Woody",
-                            Size = 0,
                             Size100 = 100,
                             Size30 = 30,
                             Size50 = 50,
@@ -429,9 +400,6 @@ namespace Fragrance.DataAccess.Migrations
                             Price50 = 140.0,
                             Quantity = 99,
                             Rating = 4.0,
-                            ScentNotes = "Ginger,Vanilla,Amber",
-                            ScentProfile = "Spicy,Woody",
-                            Size = 0,
                             Size100 = 100,
                             Size30 = 30,
                             Size50 = 50,
@@ -453,9 +421,6 @@ namespace Fragrance.DataAccess.Migrations
                             Price50 = 95.0,
                             Quantity = 99,
                             Rating = 4.2999999999999998,
-                            ScentNotes = "Ginger,Vanilla,Amber",
-                            ScentProfile = "Spicy,Woody",
-                            Size = 0,
                             Size100 = 100,
                             Size30 = 30,
                             Size50 = 50,
@@ -477,9 +442,6 @@ namespace Fragrance.DataAccess.Migrations
                             Price50 = 160.0,
                             Quantity = 99,
                             Rating = 4.5,
-                            ScentNotes = "Ginger,Vanilla,Amber",
-                            ScentProfile = "Spicy,Woody",
-                            Size = 0,
                             Size100 = 100,
                             Size30 = 30,
                             Size50 = 50,
@@ -504,9 +466,6 @@ namespace Fragrance.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("ParfumeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Size")
                         .HasColumnType("int");
 
                     b.HasKey("ShoppingCartId");

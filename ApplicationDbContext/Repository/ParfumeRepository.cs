@@ -16,6 +16,10 @@ namespace Fragrance.DataAccess.Repository
         {
             _db = db;
         }
+        public IQueryable<Parfume> GetAll()
+        {
+            return _db.Parfumes.AsQueryable();
+        }
         public void Update(Parfume obj)
         {
             var objFromDb = _db.Parfumes.FirstOrDefault(u=>u.ParfumeId == obj.ParfumeId);

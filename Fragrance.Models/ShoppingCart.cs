@@ -30,5 +30,7 @@ namespace Fragrance.Models
 
         [NotMapped]
         public double Price { get; set; }
+       
+        public int Size { get; set; }
     }
 }

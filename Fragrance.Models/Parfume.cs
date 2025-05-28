@@ -55,7 +55,9 @@ namespace Fragrance.Models
         [ValidateNever]
         
         public string ImgUrl { get; set; }
-
+        [Required]
+        [ValidateNever]
+        public int Size { get; set; }
         [Required]
         [ValidateNever]
         public int Size30 { get; set; }=30;
@@ -70,6 +72,10 @@ namespace Fragrance.Models
         [Required]
 
         public int Quantity { get; set; } = 99;
+        [ValidateNever]
+        public string ScentProfile { get; set; }
+        [ValidateNever]
+        public string ScentNotes { get; set; }
     }
 
 }

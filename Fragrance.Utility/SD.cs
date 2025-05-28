@@ -25,7 +25,11 @@ namespace Fragrance.Utility
         public const string PaymentStatusDelayedPayment = "DelayedPayment";
         public const string PaymentStatusRejected = "Rejected";
 
-
+        public static readonly List<string> ScentProfiles = new List<string>
+        {
+            "Floral", "Woody", "Citrus", "Oriental", "Gourmand"
+        };
+        public static List<string> Genders = new List<string> { "Male", "Female", "Unisex" };
         public const string SessionCart = "SessionShoppingCart";
 
     }

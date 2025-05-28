@@ -44,7 +44,9 @@ namespace Fragrance.Data
          Size30 = 30,
          Size50 = 50,
          Size100 = 100,
-         Rating = 4.1
+         Rating = 4.1,
+         ScentProfile = "Spicy,Woody",
+         ScentNotes = "Ginger,Vanilla,Amber",
      },
      new Parfume
      {
@@ -65,7 +67,9 @@ namespace Fragrance.Data
          Size30 = 30,
          Size50 = 50,
          Size100 = 100,
-         Rating = 4.7
+         Rating = 4.7,
+         ScentProfile = "Spicy,Woody",
+         ScentNotes = "Ginger,Vanilla,Amber",
      },
      new Parfume
      {
@@ -86,7 +90,9 @@ namespace Fragrance.Data
          Size30 = 30,
          Size50 = 50,
          Size100 = 100,
-         Rating = 4.5
+         Rating = 4.5,
+         ScentProfile = "Spicy,Woody",
+         ScentNotes = "Ginger,Vanilla,Amber",
      },
      new Parfume
      {
@@ -107,7 +113,9 @@ namespace Fragrance.Data
          Size30 = 30,
          Size50 = 50,
          Size100 = 100,
-         Rating = 4.9
+         Rating = 4.9,
+         ScentProfile = "Spicy,Woody",
+         ScentNotes = "Ginger,Vanilla,Amber",
      },
      new Parfume
      {
@@ -128,7 +136,9 @@ namespace Fragrance.Data
          Size30 = 30,
          Size50 = 50,
          Size100 = 100,
-         Rating = 4.8
+         Rating = 4.8,
+         ScentProfile = "Spicy,Woody",
+         ScentNotes = "Ginger,Vanilla,Amber",
      },
      new Parfume
      {
@@ -149,7 +159,9 @@ namespace Fragrance.Data
          Size30 = 30,
          Size50 = 50,
          Size100 = 100,
-         Rating = 4.2
+         Rating = 4.2,
+         ScentProfile = "Spicy,Woody",
+         ScentNotes = "Ginger,Vanilla,Amber",
      },
      new Parfume
      {
@@ -170,7 +182,9 @@ namespace Fragrance.Data
          Size30 = 30,
          Size50 = 50,
          Size100 = 100,
-         Rating = 4.3
+         Rating = 4.3,
+         ScentProfile = "Spicy,Woody",
+         ScentNotes = "Ginger,Vanilla,Amber",
      },
      new Parfume
      {
@@ -191,7 +205,9 @@ namespace Fragrance.Data
          Size30 = 30,
          Size50 = 50,
          Size100 = 100,
-         Rating = 4.0
+         Rating = 4.0,
+         ScentProfile = "Spicy,Woody",
+         ScentNotes = "Ginger,Vanilla,Amber",
      },
      new Parfume
      {
@@ -212,7 +228,9 @@ namespace Fragrance.Data
          Size30 = 30,
          Size50 = 50,
          Size100 = 100,
-         Rating = 4.3
+         Rating = 4.3,
+         ScentProfile = "Spicy,Woody",
+         ScentNotes = "Ginger,Vanilla,Amber"
      },
      new Parfume
      {
@@ -233,7 +251,9 @@ namespace Fragrance.Data
          Size30 = 30,
          Size50 = 50,
          Size100 = 100,
-         Rating = 4.5
+         Rating = 4.5,
+         ScentProfile = "Spicy,Woody",
+         ScentNotes = "Ginger,Vanilla,Amber"
      }
  );
         }

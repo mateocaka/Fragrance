@@ -39,7 +39,7 @@ namespace Fragrance.Areas.Admin.Controllers
 
             RoleManagmentVM RoleVM = new RoleManagmentVM()
             {
-                ApplicationUser = _db.applicationUsers.Include(u=>u.company).FirstOrDefault(u => u.Id == userId),
+                ApplicationUser = _db.applicationUsers.Include(u=>u.Company).FirstOrDefault(u => u.Id == userId),
                 RoleList = _db.Roles.Select(i => new SelectListItem
                 {
                     Text = i.Name,
@@ -57,20 +57,17 @@ namespace Fragrance.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> RoleManagment(RoleManagmentVM roleManagmentVM)
         {
-            // Get the ApplicationUser from db
+          
             var applicationUser = _db.applicationUsers.FirstOrDefault(u => u.Id == roleManagmentVM.ApplicationUser.Id);
             if (applicationUser == null) return NotFound();
 
-            // Get the IdentityUser for role management
-            var identityUser = await _userManager.FindByIdAsync(roleManagmentVM.ApplicationUser.Id);
-            if (identityUser == null) return NotFound();
-
-            var RoleID = _db.UserRoles.FirstOrDefault(u => u.UserId == identityUser.Id)?.RoleId;
+         
+            var RoleID = _db.UserRoles.FirstOrDefault(u => u.UserId == applicationUser.Id)?.RoleId;
             string oldRole = _db.Roles.FirstOrDefault(u => u.Id == RoleID)?.Name;
 
             if (roleManagmentVM.ApplicationUser.Role != oldRole)
             {
-                // Update company info in ApplicationUser
+               
                 if (roleManagmentVM.ApplicationUser.Role == SD.Role_Company)
                 {
                     applicationUser.CompanyId = roleManagmentVM.ApplicationUser.CompanyId;
@@ -80,24 +77,20 @@ namespace Fragrance.Areas.Admin.Controllers
                     applicationUser.CompanyId = null;
                 }
                 _db.SaveChanges();
-
-               
-
-               await _userManager.RemoveFromRoleAsync(identityUser, oldRole);
-                 
-                
-               await _userManager.AddToRoleAsync(identityUser, roleManagmentVM.ApplicationUser.Role);
+              
+               await _userManager.RemoveFromRoleAsync(applicationUser, oldRole);                               
+               await _userManager.AddToRoleAsync(applicationUser, roleManagmentVM.ApplicationUser.Role);
             }
 
             return RedirectToAction("Index");
         }
 
-
+        #region API CALLS
         [HttpGet]
         public IActionResult GetAll()
         {
             List<ApplicationUser> objUserList = _db.applicationUsers
-                .Include(u => u.company)
+                .Include(u => u.Company)  // This should load the company
                 .ToList();
 
             var userRoles = _db.UserRoles.ToList();
@@ -107,8 +100,14 @@ namespace Fragrance.Areas.Admin.Controllers
             {
                 var roleId = userRoles.FirstOrDefault(u => u.UserId == user.Id)?.RoleId;
                 user.Role = roles.FirstOrDefault(r => r.Id == roleId)?.Name ?? "None";
-                user.company ??= new() { Name = "" };
+
+                // Ensure company is properly initialized if null
+                if (user.Company == null && user.CompanyId.HasValue)
+                {
+                    user.Company = _db.Companies.FirstOrDefault(c => c.Id == user.CompanyId);
+                }
             }
+
             return Json(new { data = objUserList });
         }
 
@@ -138,5 +137,6 @@ namespace Fragrance.Areas.Admin.Controllers
             _db.SaveChanges();
             return Json(new { success = true, message = "Operation successful" });
         }
+        #endregion
     }
 }

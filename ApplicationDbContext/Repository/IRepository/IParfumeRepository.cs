@@ -12,6 +12,7 @@ namespace Fragrance.DataAccess.Repository.IRepository
 {
     public interface IParfumeRepository : IRepository<Parfume>
     {
+        IQueryable<Parfume> GetAll();
         void Update(Parfume obj);
     }
 }

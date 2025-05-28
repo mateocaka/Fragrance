@@ -9,8 +9,7 @@ namespace Fragrance.Rrugetimi
         {
             var requestPath = context.HttpContext.Request.Path;
         
-            if (requestPath.StartsWithSegments("/Identity/Account/Login") ||
-                requestPath.StartsWithSegments("/Identity/Account/Logout"))
+            if (requestPath.StartsWithSegments("/Identity/Account/Login"))
             {
                 return; 
             }

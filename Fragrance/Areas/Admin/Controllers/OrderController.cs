@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace Fragrance.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = SD.Role_Admin)]
     public class OrderController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -37,7 +37,7 @@ namespace Fragrance.Areas.Admin.Controllers
                 OrderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == orderId, includeProperties: "ApplicationUser"),
                 OrderDetail = _unitOfWork.OrderDetail.GetAll(u => u.OrderHeaderId == orderId, includeProperties: "Parfume")
             };
-            Debug.WriteLine($"PaymentStatus in Details: {OrderVM.OrderHeader?.PaymentStatus}");
+           
             return View(OrderVM);
         }
 
@@ -51,7 +51,7 @@ namespace Fragrance.Areas.Admin.Controllers
                 TempData["error"] = "Order not found.";
                 return RedirectToAction(nameof(Index));
             }
-            Debug.WriteLine($"PaymentStatus before UpdateOrderDetail: {orderFromDb.PaymentStatus}");
+           
             orderFromDb.Name = OrderVM.OrderHeader.Name;
             orderFromDb.PhoneNumber = OrderVM.OrderHeader.PhoneNumber;
             orderFromDb.StreetAddress = OrderVM.OrderHeader.StreetAddress;
@@ -83,10 +83,10 @@ namespace Fragrance.Areas.Admin.Controllers
                 TempData["error"] = "Order not found.";
                 return RedirectToAction(nameof(Index));
             }
-            Debug.WriteLine($"PaymentStatus before StartProcessing: {orderHeader.PaymentStatus}");
+            
             _unitOfWork.OrderHeader.UpdateStatus(orderHeader.Id, SD.StatusInProcess, orderHeader.PaymentStatus);
             _unitOfWork.Save();
-            Debug.WriteLine($"PaymentStatus after StartProcessing: {orderHeader.PaymentStatus}");
+           
             TempData["success"] = "Order Details Updated Successfully";
             return RedirectToAction(nameof(Details), new { orderId = orderHeader.Id });
         }
@@ -101,20 +101,16 @@ namespace Fragrance.Areas.Admin.Controllers
                 TempData["error"] = "Order not found.";
                 return RedirectToAction(nameof(Index));
             }
-            Debug.WriteLine($"TrackingNumber: {OrderVM.OrderHeader.TrackingNumber}, PaymentStatus before: {orderHeader.PaymentStatus}");
+            
             orderHeader.TrackingNumber = OrderVM.OrderHeader.TrackingNumber;
             orderHeader.Carrier = OrderVM.OrderHeader.Carrier;
             orderHeader.OrderStatus = SD.StatusShipped;
             orderHeader.ShippingDate = DateTime.Now;
 
-            if (orderHeader.PaymentStatus == SD.PaymentStatusDelayedPayment ||
-                orderHeader.PaymentStatus == SD.PaymentStatusPending)
-            {
-                orderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
-            }
+           
             _unitOfWork.OrderHeader.Update(orderHeader);
             _unitOfWork.Save();
-            Debug.WriteLine($"PaymentStatus after ShipOrder: {orderHeader.PaymentStatus}");
+           
             TempData["success"] = "Order Shipped Successfully";
             return RedirectToAction(nameof(Details), new { orderId = orderHeader.Id });
         }

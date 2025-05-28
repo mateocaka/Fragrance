@@ -1,6 +1,7 @@
 ﻿@using Fragrance.Utility
 @using Microsoft.AspNetCore.Http
 @using System.Security.Claims
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @inject IHttpContextAccessor HttpContextAccessor
 @{
     string cookiePrefix = Context.User.Identity.IsAuthenticated ? $"_{Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value}" : "";
@@ -11,10 +12,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Fragrance</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
@@ -23,34 +23,30 @@
     <link rel="stylesheet" href="//cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
     @if (theme == "light")
     {
-        <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/light.css" />
     }
     else
     {
-        <link rel="stylesheet" href="~/lib/\bootstrap/dist/css/dark.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/dark.css" />
     }
 </head>
 <body class="@theme">
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Fragrance</a>
+                <img src="~/images/download.png" alt="Fragrance Logo" class="navbar-brand" style="width: 50px; height: 50px;">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="Costumer" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="Costumer" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-
-                    
-
 
                         @if (User.IsInRole(SD.Role_Admin))
                         {
@@ -81,7 +77,7 @@
                                     </li>
                                     <li>
                                         <a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                                            Orders <i class="bi bi-database-fill-gear"></i>
+                                            Dashboard <i class="bi bi-database-fill-gear"></i>
                                         </a>
                                     </li>
                                     <li>
@@ -93,33 +89,47 @@
                             </li>
                         }
 
-
-
-
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="Costumer" asp-controller="Cart" asp-action="Index">
                                 Shopping Cart
-                                @await Component.InvokeAsync("ShoppingCart");
+                                @await Component.InvokeAsync("ShoppingCart")
                             </a>
                         </li>
-
-
-
                     </ul>
+
+                    <!-- Theme toggle buttons -->
+                    <div class="d-flex align-items-center me-3">
+                        <form id="lightThemeForm" asp-action="SetPreferences" method="get" class="nav-link">
+                            <input type="hidden" name="theme" value="light" />
+                            <input type="hidden" name="itemsPerPage" value="@ViewBag.ItemsPerPage" />
+                            <button type="submit" class="btn btn-link p-0 border-0 bg-transparent" title="Light Theme">
+                                <i class="bi bi-brightness-high-fill fs-5 @(theme == "light" ? "text-warning" : "text-secondary")"></i>
+                            </button>
+                        </form>
+                        <form id="darkThemeForm" asp-action="SetPreferences" method="get" class="nav-link">
+                            <input type="hidden" name="theme" value="dark" />
+                            <input type="hidden" name="itemsPerPage" value="@ViewBag.ItemsPerPage" />
+                            <button type="submit" class="btn btn-link p-0 border-0 bg-transparent" title="Dark Theme">
+                                <i class="bi bi-moon-stars-fill fs-5 @(theme == "dark" ? "text-white" : "text-secondary")"></i>
+                            </button>
+                        </form>
+                    </div>
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
+     
     </header>
-
-
 
     <div class="container">
         <main role="main" class="pb-3">
+            
             @RenderBody()
         </main>
     </div>
 
+    
 
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -134,32 +144,9 @@
     <script src="//cdn.datatables.net/2.2.2/js/dataTables.min.js" asp-append-version="true"></script>
     <script src="https://cdn.tiny.cloud/1/cjilvjuwlankq11fna2n0wx47sny7e62pp2xod709rnw6qia/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 
-    @if (TempData["Notification"] != null)
-    {
-        var notification = TempData["Notification"].ToString().Split('|');
-        <script>
-            toastr.options = {
-                "closeButton": true,
-                "progressBar": true,
-                "positionClass": "toast-bottom-right",
-                "timeOut": "5000"
-            };
-            toastr['@notification[0]']('@notification[1]');
-        </script>
-    }
+
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-</html>
-<script>
-    document.getElementById('toggle-theme').addEventListener('click', () => {
-      const current = document.cookie.match(/(^|;)\s*site-theme=([^;]+)/)?.[2] || 'light';
-      const next = current === 'dark' ? 'light' : 'dark';
 
-      fetch('@Url.Action("SetTheme", "Home")', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'theme=' + next
-      }).then(() => location.reload());
-    });
-</script>
+</html>

@@ -33,11 +33,29 @@
                             BaseNotes:<p class="text-secondary lh-sm">@Model.Parfume.BaseNotes</p>
                             MiddleNotes:<p class="text-secondary lh-sm">@Model.Parfume.MiddleNotes</p>
                         </div>
+            <div class="btn-group mb-3" role="group" aria-label="Size selection">
+                <input type="radio" class="btn-check" name="Size" id="size30" value="30" asp-for="Size"  />
+                    <label class="btn btn-outline-light" for="size30">
+                    <img src="@(Model.Parfume?.ImgUrl ?? "/images/fallback.jpg")" width="30%" class="rounded" alt="Size 30ml" /> 30ml
+                </label>
 
+                <input type="radio" class="btn-check" name="Size" id="size50" value="50" asp-for="Size" />
+                    <label class="btn btn-outline-light" for="size50">
+                    <img src="@(Model.Parfume?.ImgUrl ?? "/images/fallback.jpg")" width="33%" class="rounded" alt="Size 50ml" /> 50ml
+                </label>
+
+                <input type="radio" class="btn-check" name="Size" id="size100" value="100" asp-for="Size"/>
+                    <label class="btn btn-outline-light" for="size100">
+                    <img src="@(Model.Parfume?.ImgUrl ?? "/images/fallback.jpg")" width="35%" class="rounded" alt="Size 100ml" /> 100ml
+                </label>
+            </div>
+            <span asp-validation-for="Size" class="text-danger"></span>
+            <span asp-validation-for="Size" class="text-danger"></span>
                         <div class="row ps-2">
                             <div class="row ps-2">
                                 <h6 class="text-dark text-opacity-50 ">Gender : @Model.Parfume.Gender</h6>
                             </div>
+
                             <h6 class="text-dark text-opacity-50  pb-2">
                                 List Price:
                                 <span class="text-decoration-line-through">
@@ -47,16 +65,16 @@
                         </div>
                         <div class="row text-center ps-2">
                             <div class="p-1 col-3 col-lg-2 bg-white border-bottom">
-                                <div class="text-dark text-opacity-50 fw-semibold">Quantity</div>
+                                <div class="text-dark text-opacity-50 fw-semibold">Size</div>
                             </div>
                             <div class="p-1 col-3 col-lg-2 bg-white border-bottom">
-                                <div class="text-dark text-opacity-50 fw-semibold">1-50</div>
+                                <div class="text-dark text-opacity-50 fw-semibold">30ml</div>
                             </div>
                             <div class="p-1 col-3 col-lg-2 bg-white border-bottom">
-                                <div class="text-dark text-opacity-50 fw-semibold">51-100</div>
+                                <div class="text-dark text-opacity-50 fw-semibold">50ml</div>
                             </div>
                             <div class="p-1 col-3 col-lg-2 bg-white border-bottom">
-                                <div class="text-dark text-opacity-50 fw-semibold">100+</div>
+                                <div class="text-dark text-opacity-50 fw-semibold">100ml</div>
                             </div>
                         </div>
                         <div class="row text-center ps-2">
@@ -86,12 +104,14 @@
                                     <input asp-for="Count" type="number" value="@Model.Count" class="form-control"
                                            class="form-control text-end"
                                            aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
-
+                                    
                                 </div>
+                            
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12 col-md-6 pb-1">
+                               
                                 <button type="submit"
                                         class="btn btn-primary bg-gradient  w-100 py-2 text-uppercase fw-semibold">
                                     Add to Cart
